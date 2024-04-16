@@ -29,13 +29,22 @@ public class LabibaVoiceAssistant {
         vc.show(inViewController: view)
         delegate?.onInitSuccess(sheet: vc)
     }
+    
+    
+    public func showGifImage(url:String){
+        vc.showGifImage(uslString: url)
+    }
 }
 
 extension LabibaVoiceAssistant : VoiceAssistantCommunicationDelegate {
-    func onResult(results: [String : Any]) {
-        delegate?.onResult(sheet: vc, results: results)
+    func onCustomCell(tableView: UITableView, dialog: [String:Any]) -> UITableViewCell? {
+        return delegate?.onCustomCell(tableView: tableView, dialog: dialog)
     }
     
+    
+    func onResult(tableView:UITableView,results: [String : Any]) -> UITableViewCell? {
+        return delegate?.onResult(tableView:tableView,sheet: vc, results: results)
+    }
     
 }
 
@@ -43,11 +52,19 @@ extension LabibaVoiceAssistant : VoiceAssistantCommunicationDelegate {
 public protocol LabibaVoiceAssistantDelegate {
     func onInitSuccess(sheet:ActionSheet)
     func onError(sheet:ActionSheet,error:LabibaErrors)
-    func onResult(sheet:ActionSheet,results:[String:Any])
+    func onResult(tableView:UITableView,sheet:ActionSheet,results:[String:Any])->UITableViewCell?
+   // func onCustomCell(tableView:UITableView,dialog:[String:Any])-> UITableViewCell?
+}
+
+extension LabibaVoiceAssistantDelegate{
+    func onCustomCell(tableView:UITableView,dialog:[String:Any])-> UITableViewCell? {
+        return nil
+    }
 }
 
 protocol VoiceAssistantCommunicationDelegate {
-    func onResult(results:[String:Any])
+    func onResult(tableView:UITableView,results:[String:Any])-> UITableViewCell?
+    func onCustomCell(tableView:UITableView,dialog:[String:Any])-> UITableViewCell?
 }
 
 public enum LabibaErrors : String{

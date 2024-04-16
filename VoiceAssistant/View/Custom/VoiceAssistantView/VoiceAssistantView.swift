@@ -23,6 +23,7 @@ protocol VoiceRecognitionProtocol {
 
 class VoiceAssistantView: UIView {
     
+    @IBOutlet weak var suggestionCollectionView: UICollectionView!
     class func create() -> VoiceAssistantView
     {
         return bundle.loadNibNamed(String(describing: VoiceAssistantView.self), owner: nil, options: nil)![0] as! VoiceAssistantView
@@ -37,17 +38,19 @@ class VoiceAssistantView: UIView {
     var delegate:VoiceRecognitionProtocol?
     let speechToTextManager = SpeechToTextManager.shared
     var isAnimating:Bool = false
+    var suggestions : [String] = AssistantConfig.config.suggestions
+    var onSuggestionClicked: ((String)->Void)?
     
     static var HEIGHT: CGFloat = {
         switch UIScreen.current {
         case .iPhone5_8 ,.iPhone6_1 , .iPhone6_5:
-            return 120
+            return 150
         case .iPhone5_5 :
-            return 110
+            return 170
         case  .iPad9_7, .iPad10_5 ,.iPad12_9,.ipad:
-            return 120
+            return 180
         default:
-            return 100
+            return 150
         }
     }()
     
@@ -55,6 +58,9 @@ class VoiceAssistantView: UIView {
         self.layoutIfNeeded()
         swiftyWavesView.isHidden = true
         swiftyWavesView.colors = AssistantConfig.micViewTheme.waveColors
+        suggestionCollectionView.register(cellClass: SuggestionCell.self)
+        suggestionCollectionView.delegate = self
+        suggestionCollectionView.dataSource = self
         
         if let image = AssistantConfig.micViewTheme.image {
             micButton.setImage(image, for: .normal)
@@ -253,15 +259,33 @@ extension VoiceAssistantView : SpeechToTextDelegate {
     }
     
     
+    
 }
-//
-//extension VoiceAssistantView: UIDocumentPickerDelegate{
-//    
-//    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-//        if urls.count > 0 {
-//            delegate?.voiceAssistantKeyboard(self, didSubmitFile: urls[0])
-//        }
-//        controller.dismiss(animated: true, completion: nil)
-//    }
-//    
-//}
+
+
+
+extension VoiceAssistantView: UICollectionViewDelegate , UICollectionViewDataSource, UICollectionViewDelegateFlowLayout{
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return suggestions.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let suggestion = suggestions[indexPath.row]
+        let cell = collectionView.dequeueReusableCell(withClass: SuggestionCell.self, for:  indexPath)
+        cell.setData(data: suggestion)
+        return cell
+    }
+    
+    
+
+    
+   
+    
+  
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let suggestion = suggestions[indexPath.row]
+        onSuggestionClicked?(suggestion)
+    }
+    
+    
+}

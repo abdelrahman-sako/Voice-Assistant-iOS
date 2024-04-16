@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 
-public extension UITableView {
+extension UITableView {
     
     /**
      Register nibs faster by passing the type - if for some reason the `identifier` is different then it can be passed
@@ -18,9 +18,14 @@ public extension UITableView {
      */
     func registerCell(type: UITableViewCell.Type, identifier: String? = nil) {
         let cellId = String(describing: type)
-        register(UINib(nibName: cellId, bundle: bundle), forCellReuseIdentifier: identifier ?? cellId)
+        register(UINib(nibName: cellId, bundle:  bundle), forCellReuseIdentifier: identifier ?? cellId)
     }
     
+    
+    func registerCell(type: UITableViewCell.Type, identifier: String? = nil,customeBundle:Bundle? = nil) {
+        let cellId = String(describing: type)
+        register(UINib(nibName: cellId, bundle: customeBundle), forCellReuseIdentifier: identifier ?? cellId)
+    }
     /**
      DequeueCell by passing the type of UITableViewCell
      - Parameter type: UITableViewCell.Type

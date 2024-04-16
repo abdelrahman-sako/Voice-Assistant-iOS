@@ -27,7 +27,7 @@ class SpeechToTextManager {
     var delegate:SpeechToTextDelegate?
     
     private var audioEngine = AVAudioEngine()
-    private var speechRecognizer:SFSpeechRecognizer? = SFSpeechRecognizer(locale: Locale.init(identifier: "ar"))
+    private var speechRecognizer:SFSpeechRecognizer? = SFSpeechRecognizer(locale: Locale.init(identifier: "en"))
     private var request:SFSpeechAudioBufferRecognitionRequest? = SFSpeechAudioBufferRecognitionRequest()
     private var recognitionTask:SFSpeechRecognitionTask?
     

@@ -20,7 +20,10 @@ public class AssistantConfig {
     private(set) static var botViewheme =  BotChatViewTheme()
     private(set) static var userViewTheme =  UserChatViewTheme()
     private(set) static var sheetViewTheme =  SheetTheme()
-    
+    private(set) static var chipViewTheme =  ChipViewTheme()
+    private(set) static var imageViewTheme =  ImageViewTheme()
+    private(set) static var suggestionsViewTheme =  SuggestionsViewTheme()
+
     
     public static func setClientConfig(configration:ClientConfig){
         config = configration
@@ -44,6 +47,18 @@ public class AssistantConfig {
     
     public static func setSheetViewTheme(theme:SheetTheme){
         sheetViewTheme = theme
+    }
+    
+    public static func setChipViewTheme(theme:ChipViewTheme){
+        chipViewTheme = theme
+    }
+    
+    public static func setImageViewTheme(theme:ImageViewTheme){
+        imageViewTheme = theme
+    }
+    
+    public static func setSuggestionsViewTheme(theme:SuggestionsViewTheme){
+        suggestionsViewTheme = theme
     }
     
     public static func setVoiceMan(ar:String? ,en:String?){
@@ -76,9 +91,12 @@ public class ClientConfig {
     public var voices = Voice()
     var referral:[String:Any] = ["ref":"[{\"source\":\"mobile\"}]","source":"","type":""]
     private var _lastMessageLangCode = "en"
-    
+    public var registeredCells:[UITableViewCell.Type] = []
    
 
+    var bundle:Bundle?
+    var suggestions:[String] = []
+    
     public var font:(regAR:String , boldAR:String , regEN:String , boldEN:String)? =  ( "ChalkboardSE-Light", "ChalkboardSE-Bold",  "ChalkboardSE-Light", "ChalkboardSE-Bold")
     
     public var bypassSSLCertificateValidation:Bool = false
@@ -100,6 +118,16 @@ public class ClientConfig {
     {
         _lastMessageLangCode = text.detectedLangauge() ?? "en"
     }
+    
+    public func registerCells(cells:[UITableViewCell.Type],bundle:Bundle?){
+        registeredCells = cells
+        self.bundle = bundle
+    }
+    
+    public func setSuggestions(suggestions:[String]){
+        self.suggestions = suggestions
+    }
+
 }
 
 extension ClientConfig {
@@ -195,80 +223,3 @@ public class Voice {
     public var enableAutoListening :Bool = false
 }
 
-// MARK: - Classes
-public class GradientSpecs: NSObject
-{
-    public var colors: [UIColor]
-    public var locations: [CGFloat]
-    public var start: CGPoint
-    public var end: CGPoint
-    public var viewBackgroundColor: UIColor?
-    
-    public init(colors: [UIColor], locations: [CGFloat], start: CGPoint, end: CGPoint , viewBackgroundColor:UIColor? = nil)
-    {
-        self.colors = colors
-        self.locations = locations
-        self.start = start
-        self.end = end
-        self.viewBackgroundColor = viewBackgroundColor
-    }
-}
-
-
-public class TextStyle {
-    
-    public var font:UIFont?
-    public var color:  UIColor = .black
-    public init(){}
-    
-    public init(font:UIFont? = nil,color:UIColor = .black) {
-        self.font = font
-        self.color = color
-    }
-
-}
-
-public class ViewStyle{
-    public var corners:CACornerMask = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-    public var radius:CGFloat = 25
-    public var backgroundColor : UIColor = .white
-    public var tintColor:UIColor = .clear
-    
-    public init(){}
-    public init(radius: CGFloat = 0, backgroundColor: UIColor = .black, tintColor: UIColor = .clear,corners:CACornerMask = [.layerMinXMinYCorner, .layerMaxXMinYCorner]) {
-        self.radius = radius
-        self.backgroundColor = backgroundColor
-        self.tintColor = tintColor
-        self.corners = corners
-    }
-}
-
-
-public class VoiceAssistantViewTheme{
-    public var viewStyle = ViewStyle()
-    public var image:UIImage?
-    public var waveColors:[UIColor] = [.black]
-    public init(){}
-}
-
-
-public class UserChatViewTheme{
-    public var viewStyle = ViewStyle()
-    public var textStyle = TextStyle()
-    public init(){}
-
-}
-
-public class BotChatViewTheme{
-    public var viewStyle = ViewStyle()
-    public var defualtTextStyle = TextStyle()
-    public var scallTextStyle = TextStyle()
-    public init(){}
-
-}
-
-
-public class SheetTheme {
-    public var viewStyle = ViewStyle()
-    
-}

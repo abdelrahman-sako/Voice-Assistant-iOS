@@ -34,15 +34,21 @@ class VoiceAssistantViewModel : NSObject {
         botConnector.sendMessage("CONVERSATION-RELOAD")
     }
     
-    func sendMessage(message:String){
+    func sendMessage(message:String,addToMessages:Bool = true){
         let dialog = ConversationDialog(by: .user)
         dialog.message = message
-        messages.append(dialog)
+        messages = []
+
+        if addToMessages {
+            messages.append(dialog)
+        }
         botConnector.sendMessage(message)
         onSendData?()
 
+        stopVoice()
         
     }
+    
     
     func stopVoice(){
         ttsManager.stop()
@@ -83,6 +89,9 @@ extension VoiceAssistantViewModel : BotConnectorDelegate {
        
         
         
+        if activity.hasMessage {
+            AssistantConfig.config.setLastMessageLangCode(activity.message ?? "")
+        }
         
         if(messages.contains(where: {$0.party == .bot})){
             willBeAddedQueue.append(activity)
@@ -91,14 +100,13 @@ extension VoiceAssistantViewModel : BotConnectorDelegate {
         
 
         
-        if let message = activity.message {
-            AssistantConfig.config.setLastMessageLangCode(message)
+      //  if let message = activity.message {
             TextToSpeechManeger.Shared.append(dialog: activity)
             messages.append(activity)
             onReceiveData?()
-        }
+    //    }
         
-        handleCreatePost(activity: activity)
+     //   handleCreatePost(activity: activity)
         
         
     }
@@ -119,28 +127,33 @@ extension VoiceAssistantViewModel : BotConnectorDelegate {
     }
     
     func botConnectorRemoveTypingActivity(_ botConnector: BotConnector) {
-       messages = []
+      // messages = []
+        messages.removeAll(where: {$0.isTyping})
        onReceiveData?()
     }
     
+    
+    func getNextOnQueue(){
+        if let item =  willBeAddedQueue.first{
+          //  messages = []
+            messages.append(item)
+            ttsManager.append(dialog: item)
+            willBeAddedQueue.removeFirst()
+            //handleCreatePost(activity: item)
+            onReceiveData?()
+        }
+    }
     
 }
 
 
 extension VoiceAssistantViewModel :TextToSpeechDelegate {
     func textToSpeechDidStart() {
-        
     }
     
     func textToSpeechDidStop() {
-        if let item =  willBeAddedQueue.first{
-            messages = []
-            messages.append(item)
-            ttsManager.append(dialog: item)
-            willBeAddedQueue.removeFirst()
-            handleCreatePost(activity: item)
-            onReceiveData?()
-        }
+
+        getNextOnQueue()
     }
     
     

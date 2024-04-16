@@ -35,7 +35,8 @@ class TextToSpeechManeger:NSObject{
     
 
     func getURL(for model:TTSMessageModel) {//-> URL? {
-        let message = model.message.replacingOccurrences(of: "\"", with: "")
+        var message = model.message.replacingOccurrences(of: "\"", with: "")
+        message = message.isEmpty ? "\n" : message
       let TTS_Model = TextToSpeechModel(text: message, googleVoice: GoogleVoice(voiceLang: LabibaLanguages(rawValue:model.langCode) ?? .ar), clientid: "0",isSSML: model.isSSML, isBase64: AssistantConfig.config.audioType)
         DataSource.shared.textToSpeech(model: TTS_Model) { result in
             switch result{
@@ -66,9 +67,8 @@ class TextToSpeechManeger:NSObject{
     
     func append(dialog:ConversationDialog)  {
         ToDeletDialogs.append(dialog)
-        guard let message = dialog.message, !message.isEmpty  else {
-            return
-        }
+        let message = dialog.message ?? "\n"
+      //  message = message.isEmpty ? "\n" : message
         //if !Labiba.EnableTextToSpeech   { return }
         
         var filteredText = message//dialog.message ?? " "
