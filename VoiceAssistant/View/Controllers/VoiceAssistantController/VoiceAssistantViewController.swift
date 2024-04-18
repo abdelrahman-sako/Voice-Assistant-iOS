@@ -52,6 +52,8 @@ class VoiceAssistantViewController: ActionSheet {
         }
         
         
+        messagesTableView.backgroundColor = UIColor(red: 249/255, green: 249/255, blue: 246/255, alpha: 1)
+        
     }
     
     func registerCells(){

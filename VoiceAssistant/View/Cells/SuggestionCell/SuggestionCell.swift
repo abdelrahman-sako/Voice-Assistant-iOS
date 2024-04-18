@@ -26,7 +26,7 @@ class SuggestionCell: UICollectionViewCell {
         
         contanierView.layer.borderColor = borderColor.cgColor
         contanierView.layer.borderWidth = borderWidth
-        
+        contanierView.backgroundColor = AssistantConfig.suggestionsViewTheme.viewStyle.backgroundColor
         suggestionLabel.textColor = AssistantConfig.suggestionsViewTheme.textStyle.color
         suggestionLabel.font = AssistantConfig.suggestionsViewTheme.textStyle.font
         

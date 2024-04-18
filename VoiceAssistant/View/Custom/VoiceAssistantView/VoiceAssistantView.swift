@@ -65,83 +65,83 @@ class VoiceAssistantView: UIView {
         if let image = AssistantConfig.micViewTheme.image {
             micButton.setImage(image, for: .normal)
         }
-//        micButton.tintColor = Labiba._MicButtonTintColor
-//        keyboardButton.tintColor = Labiba._KeyboardIconTintColor
-//        attchmentButton.tintColor = Labiba._KeyboardIconTintColor
-//        micButton.backgroundColor = Labiba._MicButtonBackGroundColor
-//        micButton.alpha = Labiba._MicButtonAlpha
+        //        micButton.tintColor = Labiba._MicButtonTintColor
+        //        keyboardButton.tintColor = Labiba._KeyboardIconTintColor
+        //        attchmentButton.tintColor = Labiba._KeyboardIconTintColor
+        //        micButton.backgroundColor = Labiba._MicButtonBackGroundColor
+        //        micButton.alpha = Labiba._MicButtonAlpha
         
         micButton.tintColor = AssistantConfig.micViewTheme.viewStyle.tintColor
-//        keyboardButton.tintColor = Labiba.VoiceAssistantView.keyboardButton.tintColor
-//        attchmentButton.tintColor = Labiba.VoiceAssistantView.attachmentButton.tintColor
+        //        keyboardButton.tintColor = Labiba.VoiceAssistantView.keyboardButton.tintColor
+        //        attchmentButton.tintColor = Labiba.VoiceAssistantView.attachmentButton.tintColor
         micButton.backgroundColor = AssistantConfig.micViewTheme.viewStyle.backgroundColor
-      //  micButton.alpha = Labiba.VoiceAssistantView.micButton.alpha
+        //  micButton.alpha = Labiba.VoiceAssistantView.micButton.alpha
         
         micButton.imageView?.contentMode = .scaleAspectFit
-//        micButton.setImage(Labiba._MicButtonIcon, for: .normal)
-//        keyboardButton.setImage(Labiba._KeyboardButtonIcon, for: .normal)
-//        attchmentButton.setImage(Labiba._AttachmentButtonIcon, for: .normal)
-//        attchmentButton.isHidden = Labiba.isAttachmentButtonHidden
+        //        micButton.setImage(Labiba._MicButtonIcon, for: .normal)
+        //        keyboardButton.setImage(Labiba._KeyboardButtonIcon, for: .normal)
+        //        attchmentButton.setImage(Labiba._AttachmentButtonIcon, for: .normal)
+        //        attchmentButton.isHidden = Labiba.isAttachmentButtonHidden
         
-       // micButton.setImage(Labiba.VoiceAssistantView.micButton.icon, for: .normal)
-//        keyboardButton.setImage(Labiba.VoiceAssistantView.keyboardButton.icon, for: .normal)
-//        attchmentButton.setImage(Labiba.VoiceAssistantView.attachmentButton.icon, for: .normal)
-//        attchmentButton.isHidden = Labiba.VoiceAssistantView.attachmentButton.isHidden
+        // micButton.setImage(Labiba.VoiceAssistantView.micButton.icon, for: .normal)
+        //        keyboardButton.setImage(Labiba.VoiceAssistantView.keyboardButton.icon, for: .normal)
+        //        attchmentButton.setImage(Labiba.VoiceAssistantView.attachmentButton.icon, for: .normal)
+        //        attchmentButton.isHidden = Labiba.VoiceAssistantView.attachmentButton.isHidden
         
         backgroundView.applySemanticAccordingToBotLang()
-//        if Labiba.Bot_Type == .voiceAndKeyboard || Labiba.Bot_Type == .voiceToVoice{
-//            keyboardButton.isHidden = false
-//            
-//        }
+        //        if Labiba.Bot_Type == .voiceAndKeyboard || Labiba.Bot_Type == .voiceToVoice{
+        //            keyboardButton.isHidden = false
+        //
+        //        }
         
-//        if let colors = Labiba._bottomBackgroundGradient {
-//            self.applyGradient(colours: colors.colors, locations: nil)
-//        }
-//        switch Labiba.VoiceAssistantView.background {
-//        case .solid(color: let color):
-//            self.backgroundView.backgroundColor = color
-//        case .gradient(gradientSpecs: let grad):
-//            self.applyGradient(colours:grad.colors, locations: nil)
-//        case .image(image: _):break
-//        }
+        //        if let colors = Labiba._bottomBackgroundGradient {
+        //            self.applyGradient(colours: colors.colors, locations: nil)
+        //        }
+        //        switch Labiba.VoiceAssistantView.background {
+        //        case .solid(color: let color):
+        //            self.backgroundView.backgroundColor = color
+        //        case .gradient(gradientSpecs: let grad):
+        //            self.applyGradient(colours:grad.colors, locations: nil)
+        //        case .image(image: _):break
+        //        }
         
         
         
         speechToTextManager.delegate = self
         setNeedsDisplay()
-           // activateHeadPhonesStatus()
-        }
+        // activateHeadPhonesStatus()
+    }
     override func draw(_ rect: CGRect) {
         micButton.layer.cornerRadius = 35 + ipadFactor*5//micButton.frame.height/2
     }
     
     
     
-//    func activateHeadPhonesStatus(){
-//        NotificationCenter.default.addObserver(self, selector: #selector(audioRouteChangeListener(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
-//    }
-//
-//    @objc func audioRouteChangeListener(_ notification:Notification) {
-//        guard let userInfo = notification.userInfo,
-//            let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
-//            let reason = AVAudioSession.RouteChangeReason(rawValue:reasonValue) else {
-//                return
-//        }
-//        switch reason {
-//        case .unknown:
-//            if isListening{
-//                 self.finishRecording(submitTextIfExist:false)
-//            }else{
-//               self.startRecording(_ :UIButton())
-//            }
-//
-//        default:
-//            break
-//        }
-//
-//    }
+    //    func activateHeadPhonesStatus(){
+    //        NotificationCenter.default.addObserver(self, selector: #selector(audioRouteChangeListener(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
+    //    }
+    //
+    //    @objc func audioRouteChangeListener(_ notification:Notification) {
+    //        guard let userInfo = notification.userInfo,
+    //            let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+    //            let reason = AVAudioSession.RouteChangeReason(rawValue:reasonValue) else {
+    //                return
+    //        }
+    //        switch reason {
+    //        case .unknown:
+    //            if isListening{
+    //                 self.finishRecording(submitTextIfExist:false)
+    //            }else{
+    //               self.startRecording(_ :UIButton())
+    //            }
+    //
+    //        default:
+    //            break
+    //        }
+    //
+    //    }
     
-
+    
     
     func popUp(on view: UIView) -> Void
     {
@@ -158,14 +158,14 @@ class VoiceAssistantView: UIView {
         self.reconfigure(y: ty)
     }
     
-   
+    
     
     func dismiss() -> Void
     {
         self.removeFromSuperview()
     }
     
-   
+    
     
     private let topViewC = getTheMostTopViewController()
     
@@ -173,7 +173,7 @@ class VoiceAssistantView: UIView {
     func reconfigure(y: CGFloat) -> Void
     {
         let insets = topViewC?.additionalSafeAreaInsets
-       
+        
         var f = self.frame
         f.origin.y = y - (insets?.bottom ?? 0.0)
         self.frame = f
@@ -189,9 +189,9 @@ class VoiceAssistantView: UIView {
                 self.swiftyWavesView.isHidden = false
                 self.micButton.isHidden = true
                 self.keyboardButton.isHidden = true
-//                if !Labiba.VoiceAssistantView.attachmentButton.isHidden {
-//                    self.attchmentButton.isHidden = true
-//                }
+                //                if !Labiba.VoiceAssistantView.attachmentButton.isHidden {
+                //                    self.attchmentButton.isHidden = true
+                //                }
                 self.isAnimating = false
                 self.micButton.isEnabled = true
             }
@@ -207,16 +207,16 @@ class VoiceAssistantView: UIView {
     }
     
     @IBAction func keybordTypeAction(_ sender: Any) {
-//        delegate?.changeFromVoiceToKeyboardType()
-//        if Labiba.Bot_Type == .voiceToVoice {
-//            Labiba.setEnableTextToSpeech(enable: false)
-//        }
+        //        delegate?.changeFromVoiceToKeyboardType()
+        //        if Labiba.Bot_Type == .voiceToVoice {
+        //            Labiba.setEnableTextToSpeech(enable: false)
+        //        }
     }
     @IBAction func attachmentAction(_ sender: UIButton) {
-//        let topVC = getTheMostTopViewController()
-//        let documentPicker = UIDocumentPickerViewController(documentTypes:  Labiba.VoiceAssistantView.attachmentTypes.map({ $0 as String }), in: .import)
-//        documentPicker.delegate = self
-//        topVC?.present(documentPicker, animated: true, completion: nil)
+        //        let topVC = getTheMostTopViewController()
+        //        let documentPicker = UIDocumentPickerViewController(documentTypes:  Labiba.VoiceAssistantView.attachmentTypes.map({ $0 as String }), in: .import)
+        //        documentPicker.delegate = self
+        //        topVC?.present(documentPicker, animated: true, completion: nil)
     }
 }
 
@@ -240,12 +240,12 @@ extension VoiceAssistantView : SpeechToTextDelegate {
     func speechToTextFinishRecording() {
         DispatchQueue.main.asyncAfter(deadline: .now() + (isAnimating ? 0.2 : 0)) {
             self.swiftyWavesView.isHidden = true
-//            if Labiba.Bot_Type == .voiceAndKeyboard || Labiba.Bot_Type == .voiceToVoice {
-//                self.keyboardButton.isHidden = false
-//                if !Labiba.VoiceAssistantView.attachmentButton.isHidden {
-//                    self.attchmentButton.isHidden = false
-//                }
-//            }
+            //            if Labiba.Bot_Type == .voiceAndKeyboard || Labiba.Bot_Type == .voiceToVoice {
+            //                self.keyboardButton.isHidden = false
+            //                if !Labiba.VoiceAssistantView.attachmentButton.isHidden {
+            //                    self.attchmentButton.isHidden = false
+            //                }
+            //            }
             UIView.animate(withDuration: 0.3, animations: {
                 self.micButton.isHidden = false
                 self.micButton.transform = CGAffineTransform(scaleX: 1, y:1)
@@ -276,16 +276,19 @@ extension VoiceAssistantView: UICollectionViewDelegate , UICollectionViewDataSou
         return cell
     }
     
-    
-
-    
-   
-    
-  
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let suggestion = suggestions[indexPath.row]
         onSuggestionClicked?(suggestion)
     }
     
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let height = collectionView.frame.height
+        
+        let label = UILabel(frame: CGRect.zero)
+        label.text = suggestions[indexPath.item]
+        label.sizeToFit()
+        return CGSize(width: label.frame.width + 8, height: height)
+    }
     
 }
