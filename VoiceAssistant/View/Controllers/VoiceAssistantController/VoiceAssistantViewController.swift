@@ -139,12 +139,18 @@ class VoiceAssistantViewController: ActionSheet {
         
         messagesTableView.contentInset.bottom = messagesTableView.contentInset.bottom
         
-        voiceTypeDialog.frame = CGRect(x: 0, y: view.frame.height - (VoiceAssistantView.HEIGHT + 20), width: view.frame.width, height: VoiceAssistantView.HEIGHT)
+       // voiceTypeDialog.frame = CGRect(x: 0, y: view.frame.height - (VoiceAssistantView.HEIGHT + 20), width: view.frame.width, height: VoiceAssistantView.HEIGHT)
         
         self.view.addSubview(voiceTypeDialog)
         
+        voiceTypeDialog.translatesAutoresizingMaskIntoConstraints = false
         
-        
+        NSLayoutConstraint.activate([
+            voiceTypeDialog.bottomAnchor.constraint(equalTo: messagesTableView.safeAreaLayoutGuide.bottomAnchor),
+            voiceTypeDialog.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            voiceTypeDialog.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            voiceTypeDialog.heightAnchor.constraint(equalToConstant: VoiceAssistantView.HEIGHT)
+        ])
     }
     
     
