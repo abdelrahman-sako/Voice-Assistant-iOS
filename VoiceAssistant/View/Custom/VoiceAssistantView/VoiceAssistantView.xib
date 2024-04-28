@@ -12,11 +12,11 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="VoiceAssistantView" customModule="VoiceAssistant" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="1196" height="143"/>
+            <rect key="frame" x="0.0" y="0.0" width="1196" height="182"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="agm-2z-BU3">
-                    <rect key="frame" x="0.0" y="0.0" width="1196" height="143"/>
+                    <rect key="frame" x="0.0" y="0.0" width="1196" height="182"/>
                     <subviews>
                         <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZkW-G9-7HH" customClass="SwiftyWaveView" customModule="VoiceAssistant" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="69" width="1196" height="80"/>
@@ -178,7 +178,7 @@
                 <outlet property="suggestionCollectionView" destination="71g-uv-NTk" id="XJq-J8-nRH"/>
                 <outlet property="swiftyWavesView" destination="ZkW-G9-7HH" id="TYy-8S-Uk6"/>
             </connections>
-            <point key="canvasLocation" x="207.03125" y="-177.24609375"/>
+            <point key="canvasLocation" x="207.03125" y="-165.8203125"/>
         </view>
     </objects>
     <resources>
@@ -186,7 +186,7 @@
         <image name="mic" width="14.5" height="20"/>
         <image name="paperclip-solid" width="448" height="512"/>
         <systemColor name="systemGreenColor">
-            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

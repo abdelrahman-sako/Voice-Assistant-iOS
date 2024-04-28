@@ -44,13 +44,13 @@ class VoiceAssistantView: UIView {
     static var HEIGHT: CGFloat = {
         switch UIScreen.current {
         case .iPhone5_8 ,.iPhone6_1 , .iPhone6_5:
-            return 150
-        case .iPhone5_5 :
             return 170
+        case .iPhone5_5 :
+            return 190
         case  .iPad9_7, .iPad10_5 ,.iPad12_9,.ipad:
-            return 180
+            return 200
         default:
-            return 150
+            return 170
         }
     }()
     
@@ -61,7 +61,7 @@ class VoiceAssistantView: UIView {
         suggestionCollectionView.register(cellClass: SuggestionCell.self)
         suggestionCollectionView.delegate = self
         suggestionCollectionView.dataSource = self
-        
+        backgroundView.backgroundColor = AssistantConfig.sheetViewTheme.viewStyle.backgroundColor
         if let image = AssistantConfig.micViewTheme.image {
             micButton.setImage(image, for: .normal)
         }

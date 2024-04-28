@@ -48,11 +48,11 @@ class VoiceAssistantViewController: ActionSheet {
         
         
         voiceTypeDialog.onSuggestionClicked = { suggestion in
-            self.viewModel.sendMessage(message: suggestion)
+            self.viewModel.sendMessage(message: suggestion,addToMessages: false)
         }
         
         
-        messagesTableView.backgroundColor = UIColor(red: 249/255, green: 249/255, blue: 246/255, alpha: 1)
+        messagesTableView.backgroundColor = AssistantConfig.sheetViewTheme.viewStyle.backgroundColor
         
     }
     
@@ -75,6 +75,22 @@ class VoiceAssistantViewController: ActionSheet {
     
     func bindViewModel(){
         viewModel.onReceiveData = {
+            UIView.transition(with: self.messagesTableView, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                self.messagesTableView.insertRows(at: [IndexPath(row: self.viewModel.messages.count - 1,section: 0)], with: .automatic)
+                //self.messagesTableView.reloadRows(at: [IndexPath(row: self.viewModel.messages.count - 1,section: 0)], with: .automatic)
+                DispatchQueue.main.async {
+                    let indexPath = IndexPath(row: self.viewModel.messages.count-1, section: 0)
+                    self.messagesTableView.scrollToRow(at: indexPath, at: .top, animated: true)
+                }
+
+            }, completion: nil)
+
+            // This will shufle the suggestion each time we recive a message
+            self.voiceTypeDialog.suggestions.shuffle()
+            self.voiceTypeDialog.suggestionCollectionView.reloadData()
+        }
+        
+        viewModel.onReload = {
             UIView.transition(with: self.messagesTableView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.messagesTableView.reloadData()
                 DispatchQueue.main.async {
@@ -126,13 +142,13 @@ class VoiceAssistantViewController: ActionSheet {
         switch UIScreen.current {
         case .iPhone5_8 ,.iPhone6_1 , .iPhone6_5:
             //tavleViewBottomConst.constant = 50
-            messagesTableView.contentInset.bottom  = 200
+            messagesTableView.contentInset.bottom  = 210
         case .iPhone5_5 :
             //tavleViewBottomConst.constant = 90
-            messagesTableView.contentInset.bottom = 240
+            messagesTableView.contentInset.bottom = 250
         default:
             //   tavleViewBottomConst.constant = VoiceK
-            messagesTableView.contentInset.bottom = 250
+            messagesTableView.contentInset.bottom = 260
         }
         
         voiceTypeDialog.dismiss()
@@ -145,12 +161,15 @@ class VoiceAssistantViewController: ActionSheet {
         
         voiceTypeDialog.translatesAutoresizingMaskIntoConstraints = false
         
+
         NSLayoutConstraint.activate([
-            voiceTypeDialog.bottomAnchor.constraint(equalTo: messagesTableView.safeAreaLayoutGuide.bottomAnchor),
+            voiceTypeDialog.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            //voiceTypeDialog.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             voiceTypeDialog.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             voiceTypeDialog.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             voiceTypeDialog.heightAnchor.constraint(equalToConstant: VoiceAssistantView.HEIGHT)
         ])
+
     }
     
     
@@ -332,6 +351,9 @@ extension VoiceAssistantViewController : SwiftyGifDelegate {
     
     func gifDidStop(sender: UIImageView) {
         sender.removeFromSuperview()
-        viewModel.getNextOnQueue()
+        injecableImageView = nil
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            self.viewModel.getNextOnQueue()
+        }
     }
 }

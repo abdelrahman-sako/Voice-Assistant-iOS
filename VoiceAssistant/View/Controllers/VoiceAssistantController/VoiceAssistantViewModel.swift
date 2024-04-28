@@ -15,6 +15,7 @@ class VoiceAssistantViewModel : NSObject {
 
     var isTyping = false
     var onReceiveData:(()->Void)?
+    var onReload:(()->Void)?
     var onInsert:(()->Void)?
     var onRemove:(()->Void)?
     var onSendData:(()->Void)?
@@ -123,13 +124,13 @@ extension VoiceAssistantViewModel : BotConnectorDelegate {
      
         let typing = ConversationDialog(by: .bot,isTyping: true)
         messages.append(typing)
-        onReceiveData?()
+        onReload?()
     }
     
     func botConnectorRemoveTypingActivity(_ botConnector: BotConnector) {
       // messages = []
-        messages.removeAll(where: {$0.isTyping})
-       onReceiveData?()
+       messages.removeAll(where: {$0.isTyping})
+        onReload?()
     }
     
     

@@ -118,3 +118,4 @@ public class SuggestionsViewTheme {
     public var textStyle = TextStyle()
 
 }
+
