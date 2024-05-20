@@ -494,6 +494,7 @@
 		75DE02C72B78BC62007BFAD6 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				75FAF7322BE0E20400E5B98B /* VoiceAssistantFullController */,
 				759F5C402BAC3994001C456F /* ImageController */,
 				75DE02C82B78BC62007BFAD6 /* VoiceAssistantController */,
 			);
@@ -630,6 +631,13 @@
 				759C56CB2BAC1C10002648DB /* UILabelExtension.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		75FAF7322BE0E20400E5B98B /* VoiceAssistantFullController */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = VoiceAssistantFullController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

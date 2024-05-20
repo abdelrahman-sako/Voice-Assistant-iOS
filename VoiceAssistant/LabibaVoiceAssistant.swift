@@ -34,6 +34,10 @@ public class LabibaVoiceAssistant {
     public func showGifImage(url:String){
         vc.showGifImage(uslString: url)
     }
+    
+    public func sendMessage(message:String,isAdded:Bool = true){
+        vc.viewModel.sendMessage(message: message,addToMessages: isAdded)
+    }
 }
 
 extension LabibaVoiceAssistant : VoiceAssistantCommunicationDelegate {

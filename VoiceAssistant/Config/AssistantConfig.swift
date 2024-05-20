@@ -73,6 +73,9 @@ public class AssistantConfig {
     }
     
     
+    public static func getConfig() -> ClientConfig{
+        return config
+    }
     
 }
 

@@ -32,6 +32,8 @@ class VoiceAssistantViewController: ActionSheet {
         
         
         
+      
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -94,8 +96,10 @@ class VoiceAssistantViewController: ActionSheet {
             UIView.transition(with: self.messagesTableView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 self.messagesTableView.reloadData()
                 DispatchQueue.main.async {
-                    let indexPath = IndexPath(row: self.viewModel.messages.count-1, section: 0)
-                    self.messagesTableView.scrollToRow(at: indexPath, at: .top, animated: true)
+                    if !self.viewModel.messages.isEmpty{
+                        let indexPath = IndexPath(row: self.viewModel.messages.count-1, section: 0)
+                        self.messagesTableView.scrollToRow(at: indexPath, at: .top, animated: true)
+                    }
                 }
 
             }, completion: nil)
@@ -205,7 +209,9 @@ extension VoiceAssistantViewController : UITableViewDelegate , UITableViewDataSo
         
         if let items =  item.cards?.items,items.contains(where: {$0.buttons.contains(where: {$0.type == .createPost})}){
             guard let payload = items.first?.buttons.first?.payload,let dictionary = viewModel.stringJSONToDictionary(jsonString: payload) else{
-                return UITableViewCell()
+                let cell = UITableViewCell()
+                cell.backgroundColor = .clear
+                return cell
             }
             if let delegete = delegete,let cell = delegete.onResult(tableView: tableView, results: dictionary){
 //                DispatchQueue.main.asyncAfter(deadline: .now() + 1){
