@@ -25,8 +25,8 @@ public class AssistantConfig {
     private(set) static var suggestionsViewTheme =  SuggestionsViewTheme()
 
     
-    public static func setClientConfig(configration:ClientConfig){
-        config = configration
+    public static func setClientConfig(configuration:ClientConfig){
+        config = configuration
     }
     
 
