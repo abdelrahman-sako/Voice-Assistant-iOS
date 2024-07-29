@@ -5,6 +5,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -17,26 +18,32 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="192"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e5o-RU-lSE">
+                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" text="asdasdasd asdasd asdasdasd asdasdasd asdasdasd" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="cls-uF-aoq">
                         <rect key="frame" x="20" y="10" width="280" height="172"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="textColor" systemColor="labelColor"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                    </textView>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="e5o-RU-lSE" secondAttribute="trailing" constant="20" id="Ftr-lj-SID"/>
-                    <constraint firstItem="e5o-RU-lSE" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="aCP-Eo-1o5"/>
-                    <constraint firstItem="e5o-RU-lSE" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="bMH-Z3-BaU"/>
-                    <constraint firstAttribute="bottom" secondItem="e5o-RU-lSE" secondAttribute="bottom" constant="10" id="hwz-AR-FGo"/>
+                    <constraint firstAttribute="trailing" secondItem="cls-uF-aoq" secondAttribute="trailing" constant="20" id="2BI-5Q-5NV"/>
+                    <constraint firstItem="cls-uF-aoq" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="IOY-XN-U0b"/>
+                    <constraint firstAttribute="bottom" secondItem="cls-uF-aoq" secondAttribute="bottom" constant="10" id="prD-to-MVJ"/>
+                    <constraint firstItem="cls-uF-aoq" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="wAb-Sw-2yh"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
-                <outlet property="messageLabel" destination="e5o-RU-lSE" id="Boq-jO-bKm"/>
+                <outlet property="messageLabel" destination="cls-uF-aoq" id="A8B-1R-Na3"/>
             </connections>
             <point key="canvasLocation" x="141.98473282442748" y="88.028169014084511"/>
         </tableViewCell>
     </objects>
+    <resources>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

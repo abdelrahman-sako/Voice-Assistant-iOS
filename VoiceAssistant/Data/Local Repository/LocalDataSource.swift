@@ -8,8 +8,9 @@
 
 import Foundation
 class LocalDataSource:LocalDataSourceProtocol {
+
     
-    
+
     func getRecentOriginCities(handler: @escaping Handler<[LabibaModel]>) {
     }
     

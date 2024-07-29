@@ -9,7 +9,7 @@ import UIKit
 
 class BotTextMessageCell: UITableViewCell {
 
-    @IBOutlet weak var messageLabel: UILabel!
+    @IBOutlet weak var messageLabel: UITextView!
     var isScalled:Bool = false {
         didSet{
             if(isScalled){
@@ -29,6 +29,10 @@ class BotTextMessageCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        messageLabel.delegate = self
+        messageLabel.isEditable = false
+        messageLabel.isSelectable = true
+        messageLabel.dataDetectorTypes = .link
 
 //        
     }
@@ -40,7 +44,16 @@ class BotTextMessageCell: UITableViewCell {
     }
     
     func setMessageData(data:String){
+       
         messageLabel.text = data
     }
     
+}
+
+extension BotTextMessageCell : UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldInteractWith asm: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        UIApplication.shared.open(asm)
+
+        return false
+    }
 }
