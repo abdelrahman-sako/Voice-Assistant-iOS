@@ -114,6 +114,7 @@ class VoiceAssistantViewController: ActionSheet {
                 self.messagesTableView.reloadData()
             }, completion: nil)
             self.messagesTableView.scrollToRow(at: IndexPath(row:  self.viewModel.messages.count - 1, section: 0), at: .bottom, animated: true)
+            self.delegete?.onMessageSent()
         }
         
     }
@@ -251,7 +252,6 @@ extension VoiceAssistantViewController : UITableViewDelegate , UITableViewDataSo
             
             let cell = tableView.dequeueCell(withType: BotTextMessageCell.self, for: indexPath)!
             if let message = item.message{
-                cell.isScalled = !(viewModel.messages.contains(where: {$0.party == .user}) || message.count > 150 )
                 cell.setMessageData(data: message)
                 
             }else{

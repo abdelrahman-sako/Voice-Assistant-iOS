@@ -38,9 +38,29 @@ public class LabibaVoiceAssistant {
     public func sendMessage(message:String,isAdded:Bool = true){
         vc.viewModel.sendMessage(message: message,addToMessages: isAdded)
     }
+    
+    public func addBotMessage(message:String,tableview:UITableView)->UITableViewCell{
+        let cell = tableview.dequeueCell(withType: BotTextMessageCell.self) as! BotTextMessageCell 
+        cell.setMessageData(data: message)
+        
+        return cell
+    }
+    
+    
+    public func addTyping(){
+        vc.viewModel.addTyping()
+    }
+    
+    public func removeTyping(){
+        vc.viewModel.removeTyping()
+    }
 }
 
 extension LabibaVoiceAssistant : VoiceAssistantCommunicationDelegate {
+    func onMessageSent() {
+        delegate?.onMessageSent()
+    }
+    
     func onCustomCell(tableView: UITableView, dialog: [String:Any]) -> UITableViewCell? {
         return delegate?.onCustomCell(tableView: tableView, dialog: dialog)
     }
@@ -56,7 +76,10 @@ extension LabibaVoiceAssistant : VoiceAssistantCommunicationDelegate {
 public protocol LabibaVoiceAssistantDelegate {
     func onInitSuccess(sheet:ActionSheet)
     func onError(sheet:ActionSheet,error:LabibaErrors)
+//    func onResult(indexPath:IndexPath,tableView:UITableView,sheet:ActionSheet,results:[String:Any])->UITableViewCell?
     func onResult(tableView:UITableView,sheet:ActionSheet,results:[String:Any])->UITableViewCell?
+
+    func onMessageSent()
    // func onCustomCell(tableView:UITableView,dialog:[String:Any])-> UITableViewCell?
 }
 
@@ -69,6 +92,7 @@ extension LabibaVoiceAssistantDelegate{
 protocol VoiceAssistantCommunicationDelegate {
     func onResult(tableView:UITableView,results:[String:Any])-> UITableViewCell?
     func onCustomCell(tableView:UITableView,dialog:[String:Any])-> UITableViewCell?
+    func onMessageSent()
 }
 
 public enum LabibaErrors : String{

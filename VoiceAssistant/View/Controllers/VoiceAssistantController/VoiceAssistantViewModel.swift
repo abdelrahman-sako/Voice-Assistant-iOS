@@ -125,14 +125,23 @@ extension VoiceAssistantViewModel : BotConnectorDelegate {
     
     func botConnectorDidRecieveTypingActivity(_ botConnector: BotConnector) {
      
-        let typing = ConversationDialog(by: .bot,isTyping: true)
-        messages.append(typing)
-        onReload?()
+        addTyping()
     }
     
     func botConnectorRemoveTypingActivity(_ botConnector: BotConnector) {
       // messages = []
-       messages.removeAll(where: {$0.isTyping})
+
+    removeTyping()
+    }
+    
+    func removeTyping(){
+        messages.removeAll(where: {$0.isTyping})
+         onReload?()
+    }
+    
+    func addTyping(){
+        let typing = ConversationDialog(by: .bot,isTyping: true)
+        messages.append(typing)
         onReload?()
     }
     
