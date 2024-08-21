@@ -97,8 +97,9 @@ class VoiceAssistantViewController: ActionSheet {
                 self.messagesTableView.reloadData()
                 DispatchQueue.main.async {
                     if !self.viewModel.messages.isEmpty{
-                        let indexPath = IndexPath(row: self.viewModel.messages.count-1, section: 0)
-                        self.messagesTableView.scrollToRow(at: indexPath, at: .top, animated: true)
+                        
+//                        let indexPath = IndexPath(row: self.viewModel.messages.count-1, section: 0)
+//                        self.messagesTableView.scrollToRow(at: indexPath, at: .top, animated: true)
                     }
                 }
 

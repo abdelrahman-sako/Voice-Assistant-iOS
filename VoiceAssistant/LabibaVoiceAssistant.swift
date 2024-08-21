@@ -51,8 +51,8 @@ public class LabibaVoiceAssistant {
         vc.viewModel.addTyping()
     }
     
-    public func removeTyping(){
-        vc.viewModel.removeTyping()
+    public func removeTyping(withReload:Bool){
+        vc.viewModel.removeTyping(withReload: withReload)
     }
 }
 

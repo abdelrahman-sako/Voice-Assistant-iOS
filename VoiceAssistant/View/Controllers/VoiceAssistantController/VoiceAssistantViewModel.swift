@@ -134,9 +134,12 @@ extension VoiceAssistantViewModel : BotConnectorDelegate {
     removeTyping()
     }
     
-    func removeTyping(){
+    func removeTyping(withReload:Bool = true){
         messages.removeAll(where: {$0.isTyping})
-         onReload?()
+        
+        if(withReload){
+            onReload?()
+        }
     }
     
     func addTyping(){
