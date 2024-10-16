@@ -23,7 +23,8 @@ public class AssistantConfig {
     private(set) static var chipViewTheme =  ChipViewTheme()
     private(set) static var imageViewTheme =  ImageViewTheme()
     private(set) static var suggestionsViewTheme =  SuggestionsViewTheme()
-
+    private(set) static var navigationBarViewTheme =  NavigationBarViewTheme()
+    
     
     public static func setClientConfig(configuration:ClientConfig){
         config = configuration
@@ -59,6 +60,10 @@ public class AssistantConfig {
     
     public static func setSuggestionsViewTheme(theme:SuggestionsViewTheme){
         suggestionsViewTheme = theme
+    }
+    
+    public static func setNavigationBarViewTheme(theme:NavigationBarViewTheme){
+        navigationBarViewTheme = theme
     }
     
     public static func setVoiceMan(ar:String? ,en:String?){

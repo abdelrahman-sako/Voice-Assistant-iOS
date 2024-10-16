@@ -119,3 +119,13 @@ public class SuggestionsViewTheme {
 
 }
 
+public class NavigationBarViewTheme {
+    public init(){}
+
+    public var textStyle = TextStyle()
+    public var backImage : UIImage?
+    public var title : String?
+    public var backButtonStyle = ViewStyle()
+    
+
+}

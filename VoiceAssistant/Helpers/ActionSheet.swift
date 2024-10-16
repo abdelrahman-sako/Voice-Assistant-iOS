@@ -7,7 +7,7 @@
 
 
 import UIKit
-public class ActionSheet: UIViewController, UIGestureRecognizerDelegate {
+public class ActionSheet: BaseViewController, UIGestureRecognizerDelegate {
     static var Sheets:[ActionSheet] = []
     class func Create<T:UIViewController>(vc:T.Type) ->T{
         let vc = T(nibName: NSStringFromClass(vc.classForCoder()).components(separatedBy: ".").last ?? "", bundle: bundle)

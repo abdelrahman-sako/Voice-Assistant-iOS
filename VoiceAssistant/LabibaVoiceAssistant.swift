@@ -14,25 +14,42 @@ public class LabibaVoiceAssistant {
     
 
     public var delegate:LabibaVoiceAssistantDelegate?
-    var vc : VoiceAssistantViewController!
+    var vc : BaseViewController!
     
-    public func start(view:UIViewController){
-        vc = ActionSheet.Create(vc: VoiceAssistantViewController.self)
-        guard let _ = AssistantConfig.config else {
-            delegate?.onError(sheet: vc, error: .missingConfig)
-            return
-        }
+    public func start(view:UIViewController,type:AssistantType = .Sheet){
+        if type == .Sheet {
+            vc = ActionSheet.Create(vc: VoiceAssistantViewController.self)
+            guard let _ = AssistantConfig.config else {
+                delegate?.onError(sheet: vc, error: .missingConfig)
+                return
+            }
+            
         
-    
-        vc.delegete = self
-        vc.modalPresentationStyle = .overFullScreen
-        vc.show(inViewController: view)
-        delegate?.onInitSuccess(sheet: vc)
+            if let sheet = vc as? VoiceAssistantViewController {
+                sheet.delegete = self
+                sheet.modalPresentationStyle = .overFullScreen
+                sheet.show(inViewController: view)
+                delegate?.onInitSuccess(vc: sheet)
+            }
+           
+        }else{
+            guard let _ = AssistantConfig.config else {
+                delegate?.onError(sheet: vc, error: .missingConfig)
+                return
+            }
+            vc = ActionSheet.Create(vc: VoiceFullScreenViewController.self)
+            let nav = UINavigationController(rootViewController: vc)
+            vc.delegete = self
+            nav.modalPresentationStyle = .overFullScreen
+            view.present(nav, animated: true)
+            delegate?.onInitSuccess(vc: nav)
+        }
+      
     }
     
     
     public func showGifImage(url:String){
-        vc.showGifImage(uslString: url)
+        vc.showGifImage(urlString: url)
     }
     
     public func sendMessage(message:String,isAdded:Bool = true){
@@ -74,10 +91,10 @@ extension LabibaVoiceAssistant : VoiceAssistantCommunicationDelegate {
 
 
 public protocol LabibaVoiceAssistantDelegate {
-    func onInitSuccess(sheet:ActionSheet)
-    func onError(sheet:ActionSheet,error:LabibaErrors)
+    func onInitSuccess(vc:UIViewController)
+    func onError(sheet:UIViewController,error:LabibaErrors)
 //    func onResult(indexPath:IndexPath,tableView:UITableView,sheet:ActionSheet,results:[String:Any])->UITableViewCell?
-    func onResult(tableView:UITableView,sheet:ActionSheet,results:[String:Any])->UITableViewCell?
+    func onResult(tableView:UITableView,sheet:UIViewController,results:[String:Any])->UITableViewCell?
 
     func onMessageSent()
    // func onCustomCell(tableView:UITableView,dialog:[String:Any])-> UITableViewCell?
@@ -98,4 +115,9 @@ protocol VoiceAssistantCommunicationDelegate {
 public enum LabibaErrors : String{
     case missingConfig = "missingConfig"
     case voicesAreRequired = "voicesAreRequired"
+}
+
+public enum AssistantType {
+    case FullScreen
+    case Sheet
 }
