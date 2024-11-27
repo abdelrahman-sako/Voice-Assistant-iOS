@@ -63,6 +63,10 @@ public class LabibaVoiceAssistant {
         return cell
     }
     
+    public func readCustomMessage(messages:[String]){
+        vc.readCustomMessages(messages: messages)
+    }
+    
     
     public func addTyping(){
         vc.viewModel.addTyping()

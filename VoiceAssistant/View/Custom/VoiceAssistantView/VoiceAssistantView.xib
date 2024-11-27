@@ -176,6 +176,7 @@
                 <outlet property="keyboardButton" destination="0zr-IZ-sBS" id="WR4-cx-Zxg"/>
                 <outlet property="micButton" destination="qsJ-v0-fcQ" id="y0Q-Hf-RYN"/>
                 <outlet property="suggestionCollectionView" destination="71g-uv-NTk" id="XJq-J8-nRH"/>
+                <outlet property="suggestionsHeightConstraint" destination="rrI-am-ILQ" id="eVS-Sq-M21"/>
                 <outlet property="swiftyWavesView" destination="ZkW-G9-7HH" id="TYy-8S-Uk6"/>
             </connections>
             <point key="canvasLocation" x="207.03125" y="-165.8203125"/>

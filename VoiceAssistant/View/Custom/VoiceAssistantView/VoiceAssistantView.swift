@@ -29,6 +29,7 @@ class VoiceAssistantView: UIView {
         return bundle.loadNibNamed(String(describing: VoiceAssistantView.self), owner: nil, options: nil)![0] as! VoiceAssistantView
     }
     
+    @IBOutlet weak var suggestionsHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var swiftyWavesView: SwiftyWaveView!
     @IBOutlet weak var micButton: UIButton!
     @IBOutlet weak var keyboardButton: UIButton!
@@ -57,6 +58,7 @@ class VoiceAssistantView: UIView {
     override func awakeFromNib() {
         self.layoutIfNeeded()
         swiftyWavesView.isHidden = true
+        suggestionsHeightConstraint.constant = suggestions.isEmpty ? 0 : 45
         swiftyWavesView.colors = AssistantConfig.micViewTheme.waveColors
         suggestionCollectionView.register(cellClass: SuggestionCell.self)
         suggestionCollectionView.delegate = self

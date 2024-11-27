@@ -63,6 +63,10 @@ public class BaseViewController: UIViewController {
         }
     }
     
+    func readCustomMessages(messages:[String]){
+        viewModel.readCustomMessages(messages: messages)
+    }
+    
     func showGifImage(urlString:String){
     }
     
@@ -150,6 +154,14 @@ public class BaseViewController: UIViewController {
             self.delegete?.onMessageSent()
         }
         
+        viewModel.startRecordVoice = {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                self.voiceTypeDialog.startRecordingAnimation()
+                self.voiceTypeDialog.speechToTextManager.start()
+            }
+           
+        }
+        
     }
 
 }
@@ -164,6 +176,7 @@ extension BaseViewController : VoiceRecognitionProtocol{
     }
     
     func didRecognizeText(text: String) {
+        print("Did Recongnize Text : \(text)")
     }
     
     func didStopRecording() {

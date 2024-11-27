@@ -211,6 +211,9 @@ class TextToSpeechManeger:NSObject{
 
     
     func stop() {
+        if !isPlaying {
+            return
+        }
         downloadTask?.cancelRequest()
         setSessionCategoryForSpeechToText()
         player?.pause()
@@ -305,6 +308,9 @@ extension TextToSpeechManeger: AVAudioPlayerDelegate{
     
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        if !isPlaying {
+            return
+        }
         isPlaying = false
         if TTS_Models_Array.count > 0 {
             TTS_Models_Array.remove(at: 0)

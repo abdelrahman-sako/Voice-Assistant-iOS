@@ -20,6 +20,7 @@ class VoiceAssistantViewModel : NSObject {
     var onRemove:(()->Void)?
     var onSendData:(()->Void)?
     var createPost:(([String:Any])->Void)?
+    var startRecordVoice:(()->Void)?
     
     var ttsManager = TextToSpeechManeger.Shared
     
@@ -36,6 +37,10 @@ class VoiceAssistantViewModel : NSObject {
     }
     
     func sendMessage(message:String,addToMessages:Bool = true){
+        
+        if message.isEmpty {
+            return
+        }
         let dialog = ConversationDialog(by: .user)
         dialog.message = message
         messages = []
@@ -157,6 +162,17 @@ extension VoiceAssistantViewModel : BotConnectorDelegate {
             willBeAddedQueue.removeFirst()
             //handleCreatePost(activity: item)
             onReceiveData?()
+        }else{
+            if AssistantConfig.config.autoListen {
+                startRecordVoice?()
+            }
+        }
+    }
+    func readCustomMessages(messages:[String]){
+        for message in messages {
+            let activity = ConversationDialog(by: .bot)
+            activity.message = message
+            TextToSpeechManeger.Shared.append(dialog: activity)
         }
     }
     
@@ -168,7 +184,6 @@ extension VoiceAssistantViewModel :TextToSpeechDelegate {
     }
     
     func textToSpeechDidStop() {
-
         getNextOnQueue()
     }
     

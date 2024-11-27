@@ -100,7 +100,7 @@ public class ClientConfig {
     var referral:[String:Any] = ["ref":"[{\"source\":\"mobile\"}]","source":"","type":""]
     private var _lastMessageLangCode = "en"
     public var registeredCells:[UITableViewCell.Type] = []
-   
+    public var autoListen = false
 
     var bundle:Bundle?
     var suggestions:[String] = []

@@ -87,7 +87,7 @@ class VoiceFullScreenViewController: BaseViewController {
     func setupTableView(){
         messagesTableView.dataSource =  self
         messagesTableView.delegate =  self
-        messagesTableView.estimatedRowHeight = UITableView.automaticDimension;
+        messagesTableView.estimatedRowHeight = UITableView.automaticDimension
         messagesTableView.rowHeight = 200
     }
     
