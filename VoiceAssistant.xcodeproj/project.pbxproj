@@ -119,6 +119,8 @@
 		75DE03622B78BC62007BFAD6 /* ContentSizedTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DE030E2B78BC62007BFAD6 /* ContentSizedTableView.swift */; };
 		75DE03632B78BC62007BFAD6 /* ActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DE030F2B78BC62007BFAD6 /* ActionSheet.swift */; };
 		75DE03642B78BC62007BFAD6 /* LabibaVoiceAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DE03102B78BC62007BFAD6 /* LabibaVoiceAssistant.swift */; };
+		E80739B22DEC5B9800BF10AA /* TextInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E80739B12DEC5B9800BF10AA /* TextInputCell.xib */; };
+		E80739B32DEC5B9800BF10AA /* TextInputCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80739B02DEC5B9800BF10AA /* TextInputCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -245,6 +247,8 @@
 		75DE030E2B78BC62007BFAD6 /* ContentSizedTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentSizedTableView.swift; sourceTree = "<group>"; };
 		75DE030F2B78BC62007BFAD6 /* ActionSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionSheet.swift; sourceTree = "<group>"; };
 		75DE03102B78BC62007BFAD6 /* LabibaVoiceAssistant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabibaVoiceAssistant.swift; sourceTree = "<group>"; };
+		E80739B02DEC5B9800BF10AA /* TextInputCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputCell.swift; sourceTree = "<group>"; };
+		E80739B12DEC5B9800BF10AA /* TextInputCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextInputCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -484,6 +488,7 @@
 		75DE02BE2B78BC62007BFAD6 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				E80739AF2DEC5B7E00BF10AA /* TextInputCell */,
 				759C56C62BAC1A9C002648DB /* SuggestionCell */,
 				75B90FD92BA6E2E60093C577 /* ImageCell */,
 				75B90FD02BA6D7530093C577 /* ChipCell */,
@@ -657,6 +662,15 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		E80739AF2DEC5B7E00BF10AA /* TextInputCell */ = {
+			isa = PBXGroup;
+			children = (
+				E80739B02DEC5B9800BF10AA /* TextInputCell.swift */,
+				E80739B12DEC5B9800BF10AA /* TextInputCell.xib */,
+			);
+			path = TextInputCell;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -763,6 +777,7 @@
 				75B90FC92BA1CBDD0093C577 /* ChoicesCell.xib in Resources */,
 				759F5C442BAC39AD001C456F /* ImageViewController.xib in Resources */,
 				75DE03262B78BC62007BFAD6 /* BotTextMessageCell.xib in Resources */,
+				E80739B22DEC5B9800BF10AA /* TextInputCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -815,6 +830,7 @@
 				75DE035A2B78BC62007BFAD6 /* AlertUtils.swift in Sources */,
 				75DE03172B78BC62007BFAD6 /* NetworkReachabilityManager.swift in Sources */,
 				75DE03442B78BC62007BFAD6 /* RemoteDataSourceProtocol.swift in Sources */,
+				E80739B32DEC5B9800BF10AA /* TextInputCell.swift in Sources */,
 				75DE03202B78BC62007BFAD6 /* Alamofire.swift in Sources */,
 				75B131DE2BB15F3B00910147 /* NSImage+SwiftyGif.swift in Sources */,
 				75DE03432B78BC62007BFAD6 /* LocalDataSourceProtocol.swift in Sources */,

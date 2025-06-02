@@ -41,6 +41,7 @@ public class BaseViewController: UIViewController {
         tableView.registerCell(type: ChoicesCell.self)
         tableView.registerCell(type: ImageCell.self)
         tableView.registerCell(type: TypingCell.self)
+        tableView.registerCell(type: TextInputCell.self)
         AssistantConfig.config.registeredCells.forEach({tableView.registerCell(type: $0,customeBundle: AssistantConfig.config.bundle)})
         
     }
@@ -233,6 +234,21 @@ extension BaseViewController : UITableViewDelegate , UITableViewDataSource {
                 return cell
             }
             
+            if item.message == "inputText" {
+               let cell = tableView.dequeueCell(withType: TextInputCell.self, for: indexPath)!
+             
+               cell.onSendTapped = {
+                   message in
+//                   guard let self , let message = message else { return }
+                    
+                   self.viewModel.sendMessage(message: message ?? "")
+               }
+
+               cell.selectionStyle = .none
+
+               return cell
+           }
+            
             if let media = item.media {
                 if media.type == .Photo {
                     let cell = tableView.dequeueCell(withType: ImageCell.self, for: indexPath)!
@@ -323,3 +339,4 @@ extension BaseViewController : SwiftyGifDelegate {
         }
     }
 }
+
