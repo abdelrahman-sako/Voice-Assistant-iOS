@@ -53,4 +53,11 @@ struct Constants {
         }
     }
     
+    enum LocaizationConstants: String {
+        case report_title = "report_title"
+        case inquiry_report_title = "inquiry_report_title"
+        case submit_title = "submit_title"
+        case reason_title = "reason_title"
+        case required_title = "required_title"
+    }
 }

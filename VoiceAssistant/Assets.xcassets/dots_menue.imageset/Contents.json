@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "dots_menue.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

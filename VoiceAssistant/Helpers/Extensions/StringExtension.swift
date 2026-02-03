@@ -7,8 +7,19 @@
 
 import Foundation
 import UIKit
+
 extension String {
   
+    var localized: String {
+        let lang = FrameworkLocalizationManager.shared.language
+
+        return NSLocalizedString(
+            self,
+            bundle: .frameworkBundle(for: lang),
+            comment: ""
+        )
+    }
+    
   func hexColorComponents() -> (red: CGFloat, green: CGFloat, blue: CGFloat) {
     
     var cString:String = trimmingCharacters(in: .whitespacesAndNewlines).uppercased()

@@ -14,7 +14,9 @@ public class BaseViewController: UIViewController {
     var delegete:VoiceAssistantCommunicationDelegate?
 
     var injecableImageView :UIImageView? = nil
-
+    
+    var lastestMessage: String?
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -123,6 +125,7 @@ public class BaseViewController: UIViewController {
 
             }, completion: nil)
 
+            self.lastestMessage = self.viewModel.messages.last?.message
             // This will shufle the suggestion each time we recive a message
             self.voiceTypeDialog.suggestions.shuffle()
             self.voiceTypeDialog.suggestionCollectionView.reloadData()

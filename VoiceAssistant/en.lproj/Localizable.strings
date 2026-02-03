@@ -1,0 +1,12 @@
+/* 
+  Localizable.strings
+  VoiceAssistant
+
+  Created by Yazan Kareem on 27/01/2026.
+  
+*/
+"report_title" = "Report";
+"inquiry_report_title" = "Would you like to report this following response?";
+"submit_title" = "Submit";
+"reason_title" = "Reason";
+"required_title" = "Required";

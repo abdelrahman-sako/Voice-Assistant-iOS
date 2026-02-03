@@ -62,12 +62,105 @@ class VoiceAssistantViewController: ActionSheet {
 
 extension VoiceAssistantViewController {
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 10))
         
-        let dragable = UIView(frame: CGRect(x: header.frame.midX - 25, y: header.frame.midY, width: 50, height: 5))
+        return createHeerderView(tableView)
+    }
+}
+
+extension VoiceAssistantViewController {
+    
+    private func createHeerderView(_ tableView: UITableView) -> UIView {
+        let headerHeight: CGFloat = 24
+
+        let header = UIView(frame: CGRect(
+            x: 0,
+            y: 0,
+            width: tableView.frame.width,
+            height: headerHeight
+        ))
+        
+        // Drag indicator (centered)
+        let dragableWidth: CGFloat = 50
+        let dragableHeight: CGFloat = 5
+
+        let dragable = UIView(frame: CGRect(
+            x: (header.bounds.width - dragableWidth) / 2,
+            y: (header.bounds.height - dragableHeight) / 2,
+            width: dragableWidth,
+            height: dragableHeight
+        ))
+
         dragable.backgroundColor = .gray
-        
+        dragable.layer.cornerRadius = dragableHeight / 2
         header.addSubview(dragable)
+
+        // 3-dot button (vertically centered)
+        let iconSize: CGFloat = 20
+
+        let moreIcon = UIImageView(frame: CGRect(
+            x: header.frame.width - iconSize - 12,
+            y: (headerHeight - iconSize) / 2,
+            width: iconSize,
+            height: iconSize
+        ))
+
+        moreIcon.isUserInteractionEnabled = true
+        moreIcon.isHidden = true
+        moreIcon.image = UIImage(
+            named: "dots_menue",
+            in: Bundle(for: Self.self),
+            compatibleWith: nil
+        )?.withRenderingMode(.alwaysTemplate)
+
+        moreIcon.tintColor = .gray
+        moreIcon.contentMode = .scaleAspectFit
+
+        header.addSubview(moreIcon)
+
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(moreTapped))
+        moreIcon.addGestureRecognizer(tapGesture)
+        
+        header.addSubview(moreIcon)
+        
+        dragable.translatesAutoresizingMaskIntoConstraints = false
+        moreIcon.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            dragable.centerXAnchor.constraint(equalTo: header.centerXAnchor),
+            dragable.centerYAnchor.constraint(equalTo: header.centerYAnchor),
+            dragable.widthAnchor.constraint(equalToConstant: dragableWidth),
+            dragable.heightAnchor.constraint(equalToConstant: dragableHeight),
+
+            moreIcon.centerYAnchor.constraint(equalTo: header.centerYAnchor),
+            moreIcon.widthAnchor.constraint(equalToConstant: iconSize),
+            moreIcon.heightAnchor.constraint(equalToConstant: iconSize),
+            moreIcon.trailingAnchor.constraint(equalTo: header.trailingAnchor, constant: -12)
+        ])
+        
         return header
+        
+    }
+    
+    @objc private func moreTapped() {
+        
+        let viewController = CustomAlertViewController(nibName: "CustomAlertViewController", bundle: bundle)
+        viewController.presentAnimated(over: self, viewAlpha: 0.10)
+        viewController.didSelectCell = { [weak self] type in
+            switch type {
+            case .reportForm:
+                self?.goToReportSheet()
+            }
+        }
+    }
+}
+
+
+extension VoiceAssistantViewController {
+    func goToReportSheet() {
+        let viewController = ReportsViewController(nibName: "ReportsViewController", bundle: bundle)
+        viewController.targetMessage = self.lastestMessage
+        viewController.modalPresentationStyle = .overFullScreen
+        self.present(viewController, animated: true)
     }
 }
