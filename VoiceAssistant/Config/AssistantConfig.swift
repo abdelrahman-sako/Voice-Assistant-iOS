@@ -215,6 +215,9 @@ extension ClientConfig {
 }
 
 public class LoaderTheme{
+    public init() {
+        
+    }
     public var loaderText:String = "تحميل..."
     public var color:UIColor = .black
 }

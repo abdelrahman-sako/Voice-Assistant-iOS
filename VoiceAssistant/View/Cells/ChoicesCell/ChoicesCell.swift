@@ -22,6 +22,8 @@ class ChoicesCell: UITableViewCell {
         collectionView.dataSource = self
         collectionView.register(cellClass: ChipCell.self)
         
+        messageLabel.textColor = AssistantConfig.chipViewTheme.textStyle.color
+        
         let flowLayout = AlignedCollectionViewFlowLayout(
             horizontalAlignment: .left,
             verticalAlignment: .top

@@ -16,6 +16,7 @@ class ChipCell: UICollectionViewCell {
         super.awakeFromNib()
         // Initialization code
         let radius = AssistantConfig.chipViewTheme.viewStyle.radius
+        contanierView.backgroundColor = AssistantConfig.chipViewTheme.viewStyle.backgroundColor
         
         contanierView.layer.cornerRadius = radius
         
