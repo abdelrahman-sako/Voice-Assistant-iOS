@@ -90,6 +90,7 @@ public class SheetTheme {
     public init(){}
 
     public var viewStyle = ViewStyle()
+    public var showReportButton: Bool = false
     
 }
 

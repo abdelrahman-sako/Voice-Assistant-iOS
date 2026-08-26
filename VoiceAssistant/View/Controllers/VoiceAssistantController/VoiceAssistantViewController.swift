@@ -95,7 +95,7 @@ extension VoiceAssistantViewController {
         header.addSubview(dragable)
 
         // 3-dot button (vertically centered)
-        let iconSize: CGFloat = 20
+        let iconSize: CGFloat = 25
 
         let moreIcon = UIImageView(frame: CGRect(
             x: header.frame.width - iconSize - 12,
@@ -105,12 +105,12 @@ extension VoiceAssistantViewController {
         ))
 
         moreIcon.isUserInteractionEnabled = true
-        moreIcon.isHidden = true
-        moreIcon.image = UIImage(
-            named: "dots_menue",
-            in: Bundle(for: Self.self),
-            compatibleWith: nil
-        )?.withRenderingMode(.alwaysTemplate)
+        moreIcon.isHidden = !AssistantConfig.sheetViewTheme.showReportButton
+        if #available(iOS 13.0, *) {
+            moreIcon.image = UIImage(systemName: "exclamationmark.bubble")?.withRenderingMode(.alwaysTemplate)
+        } else {
+            // Fallback on earlier versions
+        }
 
         moreIcon.tintColor = .gray
         moreIcon.contentMode = .scaleAspectFit
@@ -135,7 +135,7 @@ extension VoiceAssistantViewController {
             moreIcon.centerYAnchor.constraint(equalTo: header.centerYAnchor),
             moreIcon.widthAnchor.constraint(equalToConstant: iconSize),
             moreIcon.heightAnchor.constraint(equalToConstant: iconSize),
-            moreIcon.trailingAnchor.constraint(equalTo: header.trailingAnchor, constant: -12)
+            moreIcon.trailingAnchor.constraint(equalTo: header.trailingAnchor, constant: -25)
         ])
         
         return header
