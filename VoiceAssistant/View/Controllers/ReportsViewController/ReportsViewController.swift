@@ -73,7 +73,19 @@ class ReportsViewController: UIViewController {
     }
     
     private func setData() {
-        targetMessageLbl.text = targetMessage
+        if let target = targetMessage {
+            if target.containsAnchorTags || target.containsHTML {
+                let font = targetMessageLbl.font ?? UIFont.systemFont(ofSize: 14)
+                let boldFont = UIFont.boldSystemFont(ofSize: font.pointSize)
+                let color = targetMessageLbl.textColor ?? .black
+                let attributed = target.htmlAttributedString(regularFont: font, boldFont: boldFont, color: color)
+                if attributed.length > 0 {
+                    targetMessageLbl.attributedText = attributed
+                    return
+                }
+            }
+            targetMessageLbl.text = target
+        }
     }
     
     @IBAction func submitAction(_ sender: Any) {

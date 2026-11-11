@@ -330,64 +330,104 @@ extension String
         return attributedText
     }
     
-    mutating func removeHtmlTags()  {
-        self = self.replacingOccurrences(of: "<[^>]+>", with: " ", options:
-        .regularExpression, range: nil).replacingOccurrences(of: "&[^;]+;", with:
-            "", options:.regularExpression, range: nil)
+    public var containsAnchorTags: Bool {
+        return self.range(of: "<a\\b[^>]*>", options: [.regularExpression, .caseInsensitive]) != nil
     }
 
-    public func htmlAttributedString(regularFont: UIFont, boldFont: UIFont, color: UIColor) -> NSAttributedString {
+    public var containsHTML: Bool {
+        return self.range(of: "<[a-zA-Z][^>]*>", options: .regularExpression) != nil
+    }
+
+    public var withoutHtmlTags: String {
+        var copy = self
+        copy.removeHtmlTags()
+        return copy
+    }
+
+    mutating func removeHtmlTags() {
+        self = self.replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression, range: nil)
+            .replacingOccurrences(of: "&nbsp;", with: " ", options: .caseInsensitive, range: nil)
+            .replacingOccurrences(of: "&amp;", with: "&", options: .caseInsensitive, range: nil)
+            .replacingOccurrences(of: "&lt;", with: "<", options: .caseInsensitive, range: nil)
+            .replacingOccurrences(of: "&gt;", with: ">", options: .caseInsensitive, range: nil)
+            .replacingOccurrences(of: "&quot;", with: "\"", options: .caseInsensitive, range: nil)
+            .replacingOccurrences(of: "&#39;", with: "'", options: .caseInsensitive, range: nil)
+            .replacingOccurrences(of: "&[^;]+;", with: "", options: .regularExpression, range: nil)
+    }
+
+    public func htmlAttributedString(regularFont: UIFont, boldFont: UIFont, color: UIColor, linkColor: UIColor = .systemBlue) -> NSAttributedString {
         if self.isEmpty {
             return NSAttributedString()
         }
-        guard let htmlData = NSString(string: self).data(using: String.Encoding.unicode.rawValue) else {return NSAttributedString()}
-        // the follwing code is to check if the text is HTML or ordinary text
-        let options : [NSAttributedString.DocumentReadingOptionKey: Any] = [.documentType: NSAttributedString.DocumentType.html]
-        
-        guard let attributedString = try? NSMutableAttributedString(data: htmlData, options: options, documentAttributes: nil) else {
-            return NSAttributedString()
+
+        var formattedHtml = self
+        if !formattedHtml.contains("<p") && !formattedHtml.contains("<br") && !formattedHtml.contains("<div") {
+            formattedHtml = formattedHtml.replacingOccurrences(of: "\n", with: "<br/>")
         }
+
+        formattedHtml = formattedHtml.replacingOccurrences(of: "(href=[\"'])(www\\.)", with: "$1https://www.", options: .regularExpression)
+
+        guard let htmlData = formattedHtml.data(using: .utf8) ?? NSString(string: formattedHtml).data(using: String.Encoding.unicode.rawValue) else {
+            return NSAttributedString(string: self)
+        }
+
+        let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
+            .documentType: NSAttributedString.DocumentType.html,
+            .characterEncoding: String.Encoding.utf8.rawValue
+        ]
+
+        guard let attributedString = try? NSMutableAttributedString(data: htmlData, options: options, documentAttributes: nil) else {
+            return NSAttributedString(string: self)
+        }
+
         if attributedString.length < 1 {
             return NSAttributedString()
         }
+
+        while attributedString.string.hasSuffix("\n") || attributedString.string.hasSuffix("\r") {
+            attributedString.deleteCharacters(in: NSRange(location: attributedString.length - 1, length: 1))
+        }
+
+        if attributedString.length < 1 {
+            return NSAttributedString()
+        }
+
         let fullRange = NSMakeRange(0, attributedString.length)
-        
-        var regularRanges: [NSRange] = []
-        var boldRanges: [NSRange] = []
-        
+        let isArabic = LbLanguage.isArabic || (attributedString.string.detectedLangauge() == "ar")
+
         attributedString.beginEditing()
+
         attributedString.enumerateAttribute(NSAttributedString.Key.font, in: fullRange, options: .longestEffectiveRangeNotRequired) { (value, range, stop) in
-            guard let font = value as? UIFont else {
-                return
-            }
-            if font.fontDescriptor.symbolicTraits.contains(.traitBold) {
-                boldRanges.append(range)
+            if let font = value as? UIFont, font.fontDescriptor.symbolicTraits.contains(.traitBold) {
+                attributedString.addAttribute(NSAttributedString.Key.font, value: boldFont, range: range)
             } else {
-                regularRanges.append(range)
+                attributedString.addAttribute(NSAttributedString.Key.font, value: regularFont, range: range)
             }
         }
-        
-        for range in regularRanges {
-            attributedString.addAttribute(NSAttributedString.Key.font, value: regularFont, range: range)
-        }
-        
-        for range in boldRanges {
-            attributedString.addAttribute(NSAttributedString.Key.font, value: boldFont, range: range)
-        }
-        
-        if  let htmlColor = attributedString.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? UIColor {
-            var red: CGFloat = 0
-            var green: CGFloat = 0
-            var blue: CGFloat = 0
-            var alpha: CGFloat = 0
-            htmlColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-            if green == 0 && blue == 0 && red == 0 {
-                attributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: fullRange)
+
+        attributedString.enumerateAttribute(NSAttributedString.Key.link, in: fullRange, options: []) { (value, range, stop) in
+            if value != nil {
+                attributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: linkColor, range: range)
+                attributedString.addAttribute(NSAttributedString.Key.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
+            } else {
+                attributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: range)
             }
         }
-        
+
+        attributedString.enumerateAttribute(NSAttributedString.Key.paragraphStyle, in: fullRange, options: []) { (value, range, stop) in
+            let style: NSMutableParagraphStyle
+            if let existing = value as? NSParagraphStyle, let mutable = existing.mutableCopy() as? NSMutableParagraphStyle {
+                style = mutable
+            } else {
+                style = NSMutableParagraphStyle()
+            }
+            style.alignment = isArabic ? .right : .natural
+            style.baseWritingDirection = isArabic ? .rightToLeft : .natural
+            attributedString.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: range)
+        }
+
         attributedString.endEditing()
-        
+
         return attributedString
     }
     

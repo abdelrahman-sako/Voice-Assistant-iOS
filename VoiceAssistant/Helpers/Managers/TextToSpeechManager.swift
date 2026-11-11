@@ -85,7 +85,7 @@ class TextToSpeechManeger:NSObject{
             // langCode = "en-US"
             rate = AssistantConfig.config.voices.voiceRateEN
         }
-        if let linkRange = filteredText.detectedHyperLinkRange(){
+        while let linkRange = filteredText.detectedHyperLinkRange() {
             filteredText.removeSubrange(linkRange)
         }
         // TTS_Models_Array += longMessageDivider(text: filteredText, langCode: langCode, rate: rate)

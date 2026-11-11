@@ -81,6 +81,7 @@ public class BotChatViewTheme{
     public var viewStyle = ViewStyle()
     public var defualtTextStyle = TextStyle()
     public var scallTextStyle = TextStyle()
+    public var linkColor: UIColor = .systemBlue
     public init(){}
 
 }
