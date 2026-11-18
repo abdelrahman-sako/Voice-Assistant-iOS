@@ -43,6 +43,7 @@ public class BaseViewController: UIViewController {
         tableView.registerCell(type: ChoicesCell.self)
         tableView.registerCell(type: ImageCell.self)
         tableView.registerCell(type: TypingCell.self)
+        tableView.register(CarouselCell.self, forCellReuseIdentifier: CarouselCell.reuseIdentifier)
         AssistantConfig.config.registeredCells.forEach({tableView.registerCell(type: $0,customeBundle: AssistantConfig.config.bundle)})
         
     }
@@ -115,10 +116,12 @@ public class BaseViewController: UIViewController {
     
     func bindViewModel(tableView:UITableView){
         viewModel.onReceiveData = {
+            guard !self.viewModel.messages.isEmpty else { return }
             UIView.transition(with: tableView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 tableView.insertRows(at: [IndexPath(row: self.viewModel.messages.count - 1,section: 0)], with: .automatic)
                 //self.messagesTableView.reloadRows(at: [IndexPath(row: self.viewModel.messages.count - 1,section: 0)], with: .automatic)
                 DispatchQueue.main.async {
+                    guard !self.viewModel.messages.isEmpty else { return }
                     let indexPath = IndexPath(row: self.viewModel.messages.count-1, section: 0)
                     tableView.scrollToRow(at: indexPath, at: .top, animated: true)
                 }
@@ -153,7 +156,9 @@ public class BaseViewController: UIViewController {
             UIView.transition(with: tableView, duration: 0.5, options: .transitionCrossDissolve, animations: {
                 tableView.reloadData()
             }, completion: nil)
-            tableView.scrollToRow(at: IndexPath(row:  self.viewModel.messages.count - 1, section: 0), at: .bottom, animated: true)
+            if !self.viewModel.messages.isEmpty {
+                tableView.scrollToRow(at: IndexPath(row: self.viewModel.messages.count - 1, section: 0), at: .bottom, animated: true)
+            }
             self.delegete?.onMessageSent()
         }
         
@@ -221,6 +226,18 @@ extension BaseViewController : UITableViewDelegate , UITableViewDataSource {
                 return cell
             }
         }
+
+        if item.party == .bot,
+           let cards = item.cards,
+           cards.presentation == .carousel,
+           !cards.items.isEmpty {
+            let cell = tableView.dequeueReusableCell(withIdentifier: CarouselCell.reuseIdentifier, for: indexPath) as! CarouselCell
+            cell.setData(dialog: item, availableWidth: tableView.bounds.width)
+            cell.onButtonSelected = { [weak self] button in
+                self?.handleCarouselButton(button)
+            }
+            return cell
+        }
         
         if item.party == .bot {
             
@@ -272,9 +289,64 @@ extension BaseViewController : UITableViewDelegate , UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) ->CGFloat {
-        
+        let item = viewModel.messages[indexPath.row]
+        if item.party == .bot,
+           let cards = item.cards,
+           cards.presentation == .carousel,
+           !cards.items.isEmpty {
+            return CarouselCell.rowHeight(for: item, availableWidth: tableView.bounds.width)
+        }
         return tableView.estimatedRowHeight
         
+    }
+
+    private func handleCarouselButton(_ button: DialogCardButton) {
+        if let rawURL = button.url?.trimmingCharacters(in: .whitespacesAndNewlines), !rawURL.isEmpty {
+            viewModel.stopVoiceWithoutQueue()
+            let normalizedURL = rawURL.contains("://") ? rawURL : "https://\(rawURL)"
+            let resolvedURL = URL(string: normalizedURL)
+                ?? normalizedURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed).flatMap(URL.init(string:))
+            if let url = resolvedURL, UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+            return
+        }
+
+        let payload = button.payload?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        switch button.type {
+        case .postback:
+            if !payload.isEmpty {
+                viewModel.sendCardPayload(payload: payload, displayText: button.title)
+            } else if !button.title.isEmpty {
+                viewModel.sendMessage(message: button.title)
+            }
+        case .phoneNumber:
+            viewModel.stopVoiceWithoutQueue()
+            let allowed = CharacterSet(charactersIn: "+0123456789*#,;")
+            let cleaned = String(payload.unicodeScalars.filter { allowed.contains($0) })
+            if !cleaned.isEmpty,
+               let url = URL(string: "tel://\(cleaned)"),
+               UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                showErrorMessage("لا يتوفر رقم هاتف")
+            }
+        case .email:
+            viewModel.stopVoiceWithoutQueue()
+            var components = URLComponents()
+            components.scheme = "mailto"
+            components.path = payload
+            if !payload.isEmpty,
+               let url = components.url,
+               UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        case .createPost:
+            viewModel.stopVoiceWithoutQueue()
+            if !payload.isEmpty, let dictionary = viewModel.stringJSONToDictionary(jsonString: payload) {
+                viewModel.createPost?(dictionary)
+            }
+        }
     }
     
 

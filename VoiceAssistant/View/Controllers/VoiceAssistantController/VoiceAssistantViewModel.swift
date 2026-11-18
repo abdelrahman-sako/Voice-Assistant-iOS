@@ -25,6 +25,7 @@ class VoiceAssistantViewModel : NSObject {
     var ttsManager = TextToSpeechManeger.Shared
     
     var willBeAddedQueue: [ConversationDialog] = []
+    private var suppressQueueOnStop = false
     
     override init() {
         super.init()
@@ -41,6 +42,8 @@ class VoiceAssistantViewModel : NSObject {
         if message.isEmpty {
             return
         }
+        willBeAddedQueue.removeAll()
+        stopVoiceWithoutQueue()
         let dialog = ConversationDialog(by: .user)
         dialog.message = message
         messages = []
@@ -50,11 +53,27 @@ class VoiceAssistantViewModel : NSObject {
         }
         botConnector.sendMessage(message)
         onSendData?()
-
-        stopVoice()
         
     }
-    
+
+    func sendCardPayload(payload: String, displayText: String) {
+        willBeAddedQueue.removeAll()
+        stopVoiceWithoutQueue()
+        messages = []
+        if !displayText.isEmpty {
+            let dialog = ConversationDialog(by: .user)
+            dialog.message = displayText
+            messages.append(dialog)
+        }
+        botConnector.sendMessage(nil, payload: payload)
+        onSendData?()
+    }
+
+    func stopVoiceWithoutQueue() {
+        suppressQueueOnStop = true
+        ttsManager.stop()
+        suppressQueueOnStop = false
+    }
     
     func stopVoice(){
         ttsManager.stop()
@@ -155,6 +174,7 @@ extension VoiceAssistantViewModel : BotConnectorDelegate {
     
     
     func getNextOnQueue(){
+        guard !suppressQueueOnStop else { return }
         if let item =  willBeAddedQueue.first{
           //  messages = []
             messages.append(item)

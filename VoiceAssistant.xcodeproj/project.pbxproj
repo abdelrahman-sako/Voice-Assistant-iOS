@@ -38,6 +38,7 @@
 		75B131E32BB15F3B00910147 /* NSImageView+SwiftyGif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B131DC2BB15F3B00910147 /* NSImageView+SwiftyGif.swift */; };
 		75B90FC82BA1CBDD0093C577 /* ChoicesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B90FC62BA1CBDD0093C577 /* ChoicesCell.swift */; };
 		75B90FC92BA1CBDD0093C577 /* ChoicesCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 75B90FC72BA1CBDD0093C577 /* ChoicesCell.xib */; };
+		C4A0A0010000000000000001 /* CarouselCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4A0A0010000000000000002 /* CarouselCell.swift */; };
 		75B90FCD2BA6D6A00093C577 /* ContentSizedCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B90FCC2BA6D6A00093C577 /* ContentSizedCollectionView.swift */; };
 		75B90FCF2BA6D71A0093C577 /* AlignedCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B90FCE2BA6D71A0093C577 /* AlignedCollectionViewFlowLayout.swift */; };
 		75B90FD32BA6D7850093C577 /* ChipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B90FD12BA6D7850093C577 /* ChipCell.swift */; };
@@ -174,6 +175,7 @@
 		75B131DC2BB15F3B00910147 /* NSImageView+SwiftyGif.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSImageView+SwiftyGif.swift"; sourceTree = "<group>"; };
 		75B90FC62BA1CBDD0093C577 /* ChoicesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoicesCell.swift; sourceTree = "<group>"; };
 		75B90FC72BA1CBDD0093C577 /* ChoicesCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChoicesCell.xib; sourceTree = "<group>"; };
+		C4A0A0010000000000000002 /* CarouselCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselCell.swift; sourceTree = "<group>"; };
 		75B90FCC2BA6D6A00093C577 /* ContentSizedCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentSizedCollectionView.swift; sourceTree = "<group>"; };
 		75B90FCE2BA6D71A0093C577 /* AlignedCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlignedCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
 		75B90FD12BA6D7850093C577 /* ChipCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChipCell.swift; sourceTree = "<group>"; };
@@ -514,6 +516,7 @@
 				75B90FD92BA6E2E60093C577 /* ImageCell */,
 				75B90FD02BA6D7530093C577 /* ChipCell */,
 				75B90FC52BA1CBB70093C577 /* ChoicesCell */,
+				C4A0A0010000000000000002 /* CarouselCell.swift */,
 				75DE02BF2B78BC62007BFAD6 /* BotTextMessageCell.xib */,
 				75DE02C02B78BC62007BFAD6 /* BotTextMessageCell.swift */,
 				75DE02C12B78BC62007BFAD6 /* UserCell */,
@@ -870,6 +873,7 @@
 				75DE03402B78BC62007BFAD6 /* ApiEndPoints.swift in Sources */,
 				84ABAC802F29E45900BC965D /* BundleExtension.swift in Sources */,
 				75B90FC82BA1CBDD0093C577 /* ChoicesCell.swift in Sources */,
+				C4A0A0010000000000000001 /* CarouselCell.swift in Sources */,
 				75DE03462B78BC62007BFAD6 /* Logging.swift in Sources */,
 				75B131B12BAC453000910147 /* NVActivityIndicatorShape.swift in Sources */,
 				84ABAC822F29E48500BC965D /* FrameworkLocalizationManager.swift in Sources */,
