@@ -22,6 +22,21 @@ extension SpeechToTextDelegate {
     func speechToText(didInstallBuffer buffer: AVAudioPCMBuffer) {}
 }
 
+protocol SpeechAudioSessionControlling {
+    var category: AVAudioSession.Category { get }
+    var isInputAvailable: Bool { get }
+    var recordPermission: AVAudioSession.RecordPermission { get }
+    func setCategory(_ category: AVAudioSession.Category) throws
+    func setSessionActive(_ active: Bool) throws
+    func requestRecordPermission(_ response: @escaping (Bool) -> Void)
+}
+
+extension AVAudioSession: SpeechAudioSessionControlling {
+    func setSessionActive(_ active: Bool) throws {
+        try setActive(active)
+    }
+}
+
 class SpeechToTextManager {
     
     var delegate:SpeechToTextDelegate?
@@ -34,11 +49,18 @@ class SpeechToTextManager {
     private var timer:Timer?
     private var isVoiceRecognitionAuthorized:Bool = false
     private(set) var isRecording:Bool = false
-    private let audioSession =  AVAudioSession.sharedInstance()
+    private var hasInstalledTap:Bool = false
+    private let audioSession: SpeechAudioSessionControlling
+    private let speechAuthorizationStatusProvider: () -> SFSpeechRecognizerAuthorizationStatus
     
     static let shared = SpeechToTextManager()
     
-    private init() {
+    init(
+        audioSession: SpeechAudioSessionControlling = AVAudioSession.sharedInstance(),
+        speechAuthorizationStatusProvider: @escaping () -> SFSpeechRecognizerAuthorizationStatus = { SFSpeechRecognizer.authorizationStatus() }
+    ) {
+        self.audioSession = audioSession
+        self.speechAuthorizationStatusProvider = speechAuthorizationStatusProvider
         addObservers()
         if #available(iOS 13, *) {
             print("supported locals: ",speechRecognizer?.supportsOnDeviceRecognition.description)
@@ -50,62 +72,92 @@ class SpeechToTextManager {
     deinit {
         removerObservers()
     }
+
+    static func isValidRecordingFormat(_ format: AVAudioFormat) -> Bool {
+        return format.sampleRate > 0 && format.channelCount > 0
+    }
     
     private func recordAndRecognizeSpeech()  {
-        if !isVoiceRecognitionAuthorized {
+        let authStatus = speechAuthorizationStatusProvider()
+        isVoiceRecognitionAuthorized = (authStatus == .authorized)
+        guard isVoiceRecognitionAuthorized else {
             checkVoiceRecognitionAuthorization()
-        }
-        if audioSession.category != .playAndRecord{
+            notifyFinishRecording()
             return
         }
-        
-        request = SFSpeechAudioBufferRecognitionRequest()
+
+        guard audioSession.recordPermission == .granted else {
+            microphoneAuthrization()
+            notifyFinishRecording()
+            return
+        }
+
+        guard setSessionCategoryForSpeechToText(),
+              audioSession.category == .playAndRecord,
+              audioSession.isInputAvailable else {
+            notifyFinishRecording()
+            return
+        }
+
         setLocal()
-        self.audioEngine.inputNode.removeTap(onBus: 0)
+        guard let myRecognizer = speechRecognizer else {
+            print("recognizer is not supported for the current local")
+            notifyFinishRecording()
+            return
+        }
+
+        guard myRecognizer.isAvailable else {
+            // recognizer is not availabel right now
+            notifyFinishRecording()
+            showSiriEnablementMessage()
+            return
+        }
+
+        cleanupAudioSessionState(cancelTask: true)
+
         let node = audioEngine.inputNode
        // let recordingFormate = AVAudioFormat(settings: [AVFormatIDKey: kAudioFormatLinearPCM, AVLinearPCMBitDepthKey: 16, AVLinearPCMIsFloatKey: true, AVSampleRateKey: Float64(44100), AVNumberOfChannelsKey: 1])//node.outputFormat(forBus: 0)
         let recordingFormate = node.outputFormat(forBus: 0)
+        guard Self.isValidRecordingFormat(recordingFormate) else {
+            abortRecording()
+            return
+        }
+
+        let newRequest = SFSpeechAudioBufferRecognitionRequest()
+        request = newRequest
+
         node.installTap(onBus: 0, bufferSize: 1024, format: recordingFormate) {[weak self] (buffer, _) in
             self?.request?.append(buffer)
             self?.calculatePower(forBuffer: buffer)
         }
-        
+        hasInstalledTap = true
         
         audioEngine.prepare()
         do{
             try audioEngine.start()
         }catch{
             print(error)
-        }
-        guard let myRecognizer = SFSpeechRecognizer() else {
-            print("recognizer is not supported for the current local")
+            abortRecording()
             return
         }
-        
-        if !myRecognizer.isAvailable {
-            // recognizer is not availabel right now
-            showSiriEnablementMessage()
-            return
-        }
+
         self.startSpeechTimer(withDuration: 8)
-        guard let request = request else {
-            return
-        }
         isRecording = true
        //request.contextualStrings  = [ "$ ", "dollar","Dollars", "Dollar"]
         
-        recognitionTask = speechRecognizer?.recognitionTask(with: request , resultHandler: {[weak self] (result, err) in
+        recognitionTask = myRecognizer.recognitionTask(with: newRequest , resultHandler: {[weak self] (result, err) in
             if let result = result {
                 if result.isFinal {
                     self?.finishRecording(with:result.bestTranscription.formattedString )
 //                   self?.finishRecording(with:result.bestTranscription.formattedString.withoutPunctuationCharacters.withoutSpecialCharacters )
                     return
                 }
-                self?.startSpeechTimer(withDuration: AssistantConfig.config.listeningDuration)
+                self?.startSpeechTimer(withDuration: AssistantConfig.config?.listeningDuration ?? 2)
                 let bestString = result.bestTranscription.formattedString
                 self?.delegate?.speechToText(didRecognizeText: bestString)
                 print(bestString)
             }else if let err = err {
+                self?.isRecording = false
                 print(err.localizedDescription)
                 
             }
@@ -164,56 +216,122 @@ class SpeechToTextManager {
     
     // MARK: - Control
     
-    func setSessionCategoryForSpeechToText()  {
-           do {
-             try audioSession.setCategory(AVAudioSession.Category.playAndRecord)
-           }catch let err {
-               print(err)
-           }
-       }
+    @discardableResult
+    func setSessionCategoryForSpeechToText() -> Bool {
+        do {
+            try audioSession.setCategory(AVAudioSession.Category.playAndRecord)
+            try audioSession.setSessionActive(true)
+            return true
+        } catch let err {
+            print(err)
+            return false
+        }
+    }
+
+    private func cleanupAudioSessionState(cancelTask: Bool) {
+        timer?.invalidate()
+        timer = nil
+        if cancelTask {
+            isRecording = false
+        }
+        if hasInstalledTap {
+            audioEngine.inputNode.removeTap(onBus: 0)
+            hasInstalledTap = false
+        }
+        if audioEngine.isRunning {
+            audioEngine.stop()
+        }
+        audioEngine.reset()
+        audioEngine = AVAudioEngine()
+        request?.endAudio()
+        if cancelTask {
+            recognitionTask?.cancel()
+        } else {
+            recognitionTask?.finish()
+        }
+        recognitionTask = nil
+        request = nil
+    }
+
+    private func notifyFinishRecording() {
+        if Thread.isMainThread {
+            delegate?.speechToTextFinishRecording()
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.delegate?.speechToTextFinishRecording()
+            }
+        }
+    }
+
+    private func abortRecording() {
+        cleanupAudioSessionState(cancelTask: true)
+        notifyFinishRecording()
+    }
     
     private func stop()  {
-        self.audioEngine.inputNode.removeTap(onBus: 0)
-        self.audioEngine = AVAudioEngine()
-        self.recognitionTask?.finish()
-        self.recognitionTask = nil
-        self.request = nil
-        self.audioEngine.stop()
-        self.delegate?.speechToTextFinishRecording()
+        cleanupAudioSessionState(cancelTask: false)
+        notifyFinishRecording()
     }
     
     func start()  {
-        setSessionCategoryForSpeechToText()
         NotificationCenter.default.post(name: Constants.NotificationNames.StopTextToSpeech,
                                         object: nil)
         NotificationCenter.default.post(name: Constants.NotificationNames.StopMedia, object: nil)
         self.recordAndRecognizeSpeech()
     }
+
+#if DEBUG
+    func simulateActiveRecordingForTesting() {
+        isRecording = true
+    }
+
+    func simulateSilenceTimerStopForTesting() {
+        stop()
+    }
+
+    func simulateStopWithoutSubmittingForTesting() {
+        finishRecording()
+    }
+
+    func simulateFinalTranscriptionForTesting(_ text: String) {
+        finishRecording(with: text)
+    }
+#endif
     
     
     // MARK:- Observers
     
     func removerObservers() {
-        NotificationCenter.default.removeObserver(startSpeechToTextOb!, name: Constants.NotificationNames.StartSpeechToText, object: nil)
-        NotificationCenter.default.removeObserver(startSpeechToTextOb!, name: Constants.NotificationNames.StopSpeechToText, object: nil)
+        observerTokens.forEach { NotificationCenter.default.removeObserver($0) }
+        observerTokens.removeAll()
     }
-    // var startSpeechToTextOb: NSObjectProtocol?
-    var startSpeechToTextOb:Any?
+    private var observerTokens: [NSObjectProtocol] = []
     private func addObservers()  {
-        startSpeechToTextOb =  NotificationCenter.default.addObserver(forName: Constants.NotificationNames.StartSpeechToText, object: nil, queue: OperationQueue.main) { [weak self] (notification) in
+        let startObserver = NotificationCenter.default.addObserver(forName: Constants.NotificationNames.StartSpeechToText, object: nil, queue: OperationQueue.main) { [weak self] (notification) in
             self?.delegate?.speechToTextDidStartRecognition()
             DispatchQueue.main.async(execute: {[weak self] in
                 self?.start()
                 
             })
         }
-        NotificationCenter.default.addObserver(forName: Constants.NotificationNames.StopSpeechToText, object: nil, queue: OperationQueue.main) { [weak self](notification) in
+        let stopObserver = NotificationCenter.default.addObserver(forName: Constants.NotificationNames.StopSpeechToText, object: nil, queue: OperationQueue.main) { [weak self](notification) in
             self?.finishRecording()
         }
+        let interruptionObserver = NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: OperationQueue.main) { [weak self] notification in
+            guard let userInfo = notification.userInfo,
+                  let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+                  let type = AVAudioSession.InterruptionType(rawValue: typeValue),
+                  type == .began else {
+                return
+            }
+            self?.finishRecording()
+        }
+        observerTokens = [startObserver, stopObserver, interruptionObserver]
     }
     
     private func setLocal() {
-        self.speechRecognizer = SFSpeechRecognizer(locale: Locale.init(identifier: AssistantConfig.config.lastMessageLangCode))
+        let langCode = AssistantConfig.config?.lastMessageLangCode ?? "en"
+        self.speechRecognizer = SFSpeechRecognizer(locale: Locale.init(identifier: langCode))
     }
     
    
@@ -221,7 +339,8 @@ class SpeechToTextManager {
     // MARK:- Authuraization
     private func checkVoiceRecognitionAuthorization() {
         SFSpeechRecognizer.requestAuthorization {
-            [unowned self] (authStatus) in
+            [weak self] (authStatus) in
+            guard let self = self else { return }
             switch authStatus {
             case .authorized:
                 self.isVoiceRecognitionAuthorized = true
@@ -235,7 +354,7 @@ class SpeechToTextManager {
     }
     
     private func microphoneAuthrization()  {
-        AVAudioSession.sharedInstance().requestRecordPermission { [weak self](granted) in
+        audioSession.requestRecordPermission { [weak self](granted) in
             if !granted {
                 self?.errorMessageToAppSetting(message: "make_sure_mic_enabled".localForChosnLangCodeBB)
             }

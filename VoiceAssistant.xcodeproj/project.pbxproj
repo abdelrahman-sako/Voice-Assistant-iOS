@@ -119,8 +119,6 @@
 		75DE03622B78BC62007BFAD6 /* ContentSizedTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DE030E2B78BC62007BFAD6 /* ContentSizedTableView.swift */; };
 		75DE03632B78BC62007BFAD6 /* ActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DE030F2B78BC62007BFAD6 /* ActionSheet.swift */; };
 		75DE03642B78BC62007BFAD6 /* LabibaVoiceAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DE03102B78BC62007BFAD6 /* LabibaVoiceAssistant.swift */; };
-		E80739B22DEC5B9800BF10AA /* TextInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E80739B12DEC5B9800BF10AA /* TextInputCell.xib */; };
-		E80739B32DEC5B9800BF10AA /* TextInputCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80739B02DEC5B9800BF10AA /* TextInputCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -247,8 +245,6 @@
 		75DE030E2B78BC62007BFAD6 /* ContentSizedTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentSizedTableView.swift; sourceTree = "<group>"; };
 		75DE030F2B78BC62007BFAD6 /* ActionSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionSheet.swift; sourceTree = "<group>"; };
 		75DE03102B78BC62007BFAD6 /* LabibaVoiceAssistant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabibaVoiceAssistant.swift; sourceTree = "<group>"; };
-		E80739B02DEC5B9800BF10AA /* TextInputCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputCell.swift; sourceTree = "<group>"; };
-		E80739B12DEC5B9800BF10AA /* TextInputCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextInputCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -488,7 +484,6 @@
 		75DE02BE2B78BC62007BFAD6 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				E80739AF2DEC5B7E00BF10AA /* TextInputCell */,
 				759C56C62BAC1A9C002648DB /* SuggestionCell */,
 				75B90FD92BA6E2E60093C577 /* ImageCell */,
 				75B90FD02BA6D7530093C577 /* ChipCell */,
@@ -662,15 +657,6 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		E80739AF2DEC5B7E00BF10AA /* TextInputCell */ = {
-			isa = PBXGroup;
-			children = (
-				E80739B02DEC5B9800BF10AA /* TextInputCell.swift */,
-				E80739B12DEC5B9800BF10AA /* TextInputCell.xib */,
-			);
-			path = TextInputCell;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -730,7 +716,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2720;
 				TargetAttributes = {
 					75DE01C52B78BBC8007BFAD6 = {
 						CreatedOnToolsVersion = 15.0;
@@ -777,7 +763,6 @@
 				75B90FC92BA1CBDD0093C577 /* ChoicesCell.xib in Resources */,
 				759F5C442BAC39AD001C456F /* ImageViewController.xib in Resources */,
 				75DE03262B78BC62007BFAD6 /* BotTextMessageCell.xib in Resources */,
-				E80739B22DEC5B9800BF10AA /* TextInputCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -830,7 +815,6 @@
 				75DE035A2B78BC62007BFAD6 /* AlertUtils.swift in Sources */,
 				75DE03172B78BC62007BFAD6 /* NetworkReachabilityManager.swift in Sources */,
 				75DE03442B78BC62007BFAD6 /* RemoteDataSourceProtocol.swift in Sources */,
-				E80739B32DEC5B9800BF10AA /* TextInputCell.swift in Sources */,
 				75DE03202B78BC62007BFAD6 /* Alamofire.swift in Sources */,
 				75B131DE2BB15F3B00910147 /* NSImage+SwiftyGif.swift in Sources */,
 				75DE03432B78BC62007BFAD6 /* LocalDataSourceProtocol.swift in Sources */,
@@ -950,6 +934,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = LT6MNHQ4GW;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1017,6 +1002,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = LT6MNHQ4GW;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1033,6 +1019,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1044,10 +1031,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = LT6MNHQ4GW;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1055,7 +1042,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1077,10 +1064,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = LT6MNHQ4GW;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1088,7 +1075,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1112,7 +1099,6 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LT6MNHQ4GW;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.imagine.Labiba.VoiceAssistantTests;
@@ -1129,7 +1115,6 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LT6MNHQ4GW;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.imagine.Labiba.VoiceAssistantTests;
@@ -1177,6 +1162,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = LT6MNHQ4GW;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1211,10 +1197,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = LT6MNHQ4GW;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1222,7 +1208,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1246,7 +1232,6 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LT6MNHQ4GW;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.imagine.Labiba.VoiceAssistantTests;

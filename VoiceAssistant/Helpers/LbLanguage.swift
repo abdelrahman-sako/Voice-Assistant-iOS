@@ -60,14 +60,16 @@ extension String
     public var localForChosnLangCodeBB: String  //  for the bot Bundel (framework Bundel)
     {
         let language = SharedPreference.shared.botLangCode
-        guard let path = Constants.mainBundle.path(forResource: language.rawValue == "en" ? "Base" : language.rawValue, ofType: "lproj") else {
-            
-            let basePath = Bundle.main.path(forResource: "Base", ofType: "lproj")!
-            
-            return Bundle(path: basePath)!.localizedString(forKey: self, value: "", table: nil)
+        let resourceName = language.rawValue == "en" ? "Base" : language.rawValue
+        if let path = Constants.mainBundle.path(forResource: resourceName, ofType: "lproj"),
+           let bundle = Bundle(path: path) {
+            return bundle.localizedString(forKey: self, value: "", table: nil)
         }
-        
-        return Bundle(path: path)!.localizedString(forKey: self, value: "", table: nil)
+        if let basePath = Bundle.main.path(forResource: "Base", ofType: "lproj"),
+           let bundle = Bundle(path: basePath) {
+            return bundle.localizedString(forKey: self, value: "", table: nil)
+        }
+        return self
     }
     
     public var localForChosnLangCodeMB: String // for the main Bundel (App Bundel)

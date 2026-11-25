@@ -188,6 +188,15 @@ class VoiceAssistantView: UIView {
             UIView.animate(withDuration: 0.2, animations: {
                 self.micButton.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
             }) { (result) in
+                guard self.speechToTextManager.isRecording else {
+                    self.swiftyWavesView.isHidden = true
+                    self.swiftyWavesView?.stop()
+                    self.micButton.isHidden = false
+                    self.micButton.transform = .identity
+                    self.isAnimating = false
+                    self.micButton.isEnabled = true
+                    return
+                }
                 self.swiftyWavesView.isHidden = false
                 self.micButton.isHidden = true
                 self.keyboardButton.isHidden = true

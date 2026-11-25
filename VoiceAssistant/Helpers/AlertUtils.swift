@@ -31,7 +31,10 @@ func showErrorMessage(title:String = "app-title".localForChosnLangCodeBB , _ mes
                 })
                 alert.addAction(cancelAction)
             }
-            getTheMostTopViewController().present(alert, animated: true, completion: {})
+            guard let topVC = getTheMostTopViewController() else {
+                return
+            }
+            topVC.present(alert, animated: true, completion: {})
     }
 }
 
