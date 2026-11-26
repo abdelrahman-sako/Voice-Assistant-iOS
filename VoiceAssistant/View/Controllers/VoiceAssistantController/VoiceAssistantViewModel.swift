@@ -62,7 +62,7 @@ class VoiceAssistantViewModel : NSObject {
     
     func stringJSONToDictionary(jsonString:String) -> [String:Any]?{
         // Convert JSON string to Data
-        let cleanedString = jsonString
+        _ = jsonString
                .replacingOccurrences(of: "\n", with: "")
                .replacingOccurrences(of: "\\", with: "")
         guard let jsonData = jsonString.data(using: .utf8) else {

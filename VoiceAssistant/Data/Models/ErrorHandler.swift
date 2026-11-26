@@ -39,7 +39,7 @@ extension Int{
     static let Unknown:Int =       1111113
 }
 
-class LabibaError:NSError{
+class LabibaError:NSError, @unchecked Sendable{
     
     private enum NetworkError:Int {
         case unAuthorized = 401

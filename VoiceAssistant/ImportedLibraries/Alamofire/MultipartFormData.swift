@@ -23,6 +23,7 @@
 //
 
 import Foundation
+import UniformTypeIdentifiers
 
 #if os(iOS) || os(watchOS) || os(tvOS)
 import MobileCoreServices
@@ -535,13 +536,11 @@ import CoreServices
     // MARK: - Private - Mime Type
 
     private func mimeType(forPathExtension pathExtension: String) -> String {
-        if
-            let id = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as CFString, nil)?.takeRetainedValue(),
-            let contentType = UTTypeCopyPreferredTagWithClass(id, kUTTagClassMIMEType)?.takeRetainedValue()
-        {
-            return contentType as String
-        }
 
+        if let contentType = UTType(filenameExtension: pathExtension),
+           let mimeType = contentType.preferredMIMEType {
+            return mimeType
+        }
         return "application/octet-stream"
     }
 

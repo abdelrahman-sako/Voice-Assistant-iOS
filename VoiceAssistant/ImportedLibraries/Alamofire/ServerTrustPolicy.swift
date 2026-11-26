@@ -60,7 +60,7 @@ class ServerTrustPolicyManager {
 
 extension URLSession {
     private struct AssociatedKeys {
-        static var managerKey = "URLSession.ServerTrustPolicyManager"
+        static var managerKey: UInt8 = 0// = "URLSession.ServerTrustPolicyManager"
     }
 
     var serverTrustPolicyManager: ServerTrustPolicyManager? {
@@ -261,11 +261,20 @@ enum ServerTrustPolicy {
 
     // MARK: - Private - Certificate Data
 
+    func getCertificate(from trust: SecTrust, at index: Int) -> SecCertificate? {
+        guard let certificates = SecTrustCopyCertificateChain(trust) as? [SecCertificate],
+              certificates.indices.contains(index) else {
+            return nil
+        }
+
+        return certificates[index]
+    }
+    
     private func certificateData(for trust: SecTrust) -> [Data] {
         var certificates: [SecCertificate] = []
 
         for index in 0..<SecTrustGetCertificateCount(trust) {
-            if let certificate = SecTrustGetCertificateAtIndex(trust, index) {
+            if let certificate = getCertificate(from: trust, at: index) {
                 certificates.append(certificate)
             }
         }
@@ -280,13 +289,15 @@ enum ServerTrustPolicy {
     // MARK: - Private - Key Extraction
 
     private static func publicKeys(for trust: SecTrust) -> [SecKey] {
+
         var publicKeys: [SecKey] = []
 
-        for index in 0..<SecTrustGetCertificateCount(trust) {
-            if
-                let certificate = SecTrustGetCertificateAtIndex(trust, index),
-                let publicKey = publicKey(for: certificate)
-            {
+        guard let certificates = SecTrustCopyCertificateChain(trust) as? [SecCertificate] else {
+            return publicKeys
+        }
+
+        for certificate in certificates {
+            if let publicKey = publicKey(for: certificate) {
                 publicKeys.append(publicKey)
             }
         }
@@ -302,7 +313,7 @@ enum ServerTrustPolicy {
         let trustCreationStatus = SecTrustCreateWithCertificates(certificate, policy, &trust)
 
         if let trust = trust, trustCreationStatus == errSecSuccess {
-            publicKey = SecTrustCopyPublicKey(trust)
+            publicKey = SecTrustCopyKey(trust)
         }
 
         return publicKey

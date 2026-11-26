@@ -150,7 +150,7 @@ class VoiceAssistantView: UIView {
         let root = view
         let r = root.frame
         let w = r.size.width
-        let y = r.size.height
+        _ = r.size.height
         self.frame = CGRect(x: 0, y: 0 , width: w, height: VoiceAssistantView.HEIGHT )
         let views = UIView(frame: CGRect(x: 0, y: 0 , width: w, height: 200 ))
         views.backgroundColor = .red
@@ -188,7 +188,7 @@ class VoiceAssistantView: UIView {
             UIView.animate(withDuration: 0.2, animations: {
                 self.micButton.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
             }) { (result) in
-                guard self.speechToTextManager.isRecording else {
+                guard self.speechToTextManager.isRecording || self.speechToTextManager.isStarting else {
                     self.swiftyWavesView.isHidden = true
                     self.swiftyWavesView?.stop()
                     self.micButton.isHidden = false
@@ -250,6 +250,9 @@ extension VoiceAssistantView : SpeechToTextDelegate {
     
     func speechToTextFinishRecording() {
         DispatchQueue.main.asyncAfter(deadline: .now() + (isAnimating ? 0.2 : 0)) {
+            guard !self.speechToTextManager.isRecording, !self.speechToTextManager.isStarting else {
+                return
+            }
             self.swiftyWavesView.isHidden = true
             //            if Labiba.Bot_Type == .voiceAndKeyboard || Labiba.Bot_Type == .voiceToVoice {
             //                self.keyboardButton.isHidden = false
@@ -262,6 +265,7 @@ extension VoiceAssistantView : SpeechToTextDelegate {
                 self.micButton.transform = CGAffineTransform(scaleX: 1, y:1)
             }) { (result) in
                 self.isAnimating = false
+                self.micButton.isEnabled = true
             }
         }
         isAnimating = true

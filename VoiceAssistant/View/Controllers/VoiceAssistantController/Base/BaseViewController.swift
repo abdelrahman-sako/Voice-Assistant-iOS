@@ -50,7 +50,7 @@ public class BaseViewController: UIViewController {
             return
         }
         if let url = URL(string: urlString) {
-            let loader = UIActivityIndicatorView(style: .white)
+            let loader = UIActivityIndicatorView(style: .medium)
             injecableImageView = UIImageView(frame: tableView.frame)
             injecableImageView!.setGifFromURL(url, loopCount: 1, customLoader: loader)
             injecableImageView!.delegate = self

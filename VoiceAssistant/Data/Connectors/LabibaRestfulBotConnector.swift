@@ -139,7 +139,7 @@ class LabibaRestfulBotConnector{ //
                                 case .location :
                                     dialog.requestLocation = true
                                     fallthrough
-                                case .dateAndTime ,.date ,.time , .location ,.QRCode,.camera,.image,.gallery:
+                                case .dateAndTime ,.date ,.time ,.QRCode,.camera,.image,.gallery:
                                     dialogChoice.title = contentType.title
                                     dialogChoice.action = contentType.action
                                     dialog.choices = [dialogChoice]
@@ -180,7 +180,7 @@ class LabibaRestfulBotConnector{ //
                         if dialogChoice.title.hasPrefix("CALENDAR:")
                         {
                             let index = dialogChoice.title.index(dialogChoice.title.startIndex, offsetBy: 9)
-                            dialogChoice.title = dialogChoice.title.substring(from: index)
+                            dialogChoice.title = String(dialogChoice.title[index...])
                             dialogChoice.action = DialogChoiceAction.calendar
                         }
                         if let _payStr = reply.getPayloadObj()

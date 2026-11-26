@@ -13,6 +13,12 @@ protocol TextToSpeechDelegate {
     func textToSpeechDidStop()
 }
 
+protocol TextToSpeechAudioSessionControlling {
+    func setCategory(_ category: AVAudioSession.Category) throws
+}
+
+extension AVAudioSession: TextToSpeechAudioSessionControlling {}
+
 class TextToSpeechManeger:NSObject{
     private var audioEngine = AVAudioEngine()
     private var player:AVAudioPlayer?
@@ -21,14 +27,21 @@ class TextToSpeechManeger:NSObject{
     private var isPlaying:Bool = false
     private var voiceRate:Float = 1.3
     private var volume:Float = 1.0
-    private let audioSession =  AVAudioSession.sharedInstance()
+    private var playbackGeneration: Int = 0
+    private let audioSessionQueue = SpeechToTextManager.sharedAudioSessionQueue
+    private let audioSession: TextToSpeechAudioSessionControlling
     private var downloadTask:AnyCancelable?
     var delegate:TextToSpeechDelegate?
     static let Shared = TextToSpeechManeger()
     var botConnector:BotConnector = BotConnector.shared
     private var ToDeletDialogs:[ConversationDialog] = []
   
-    private override init(){
+    private convenience override init(){
+        self.init(audioSession: AVAudioSession.sharedInstance())
+    }
+
+    init(audioSession: TextToSpeechAudioSessionControlling) {
+        self.audioSession = audioSession
         super.init()
         addStopTTSObserver()
     }
@@ -107,7 +120,7 @@ class TextToSpeechManeger:NSObject{
             let segmentCount = text.count/180
             let reminder = text.count % 180
             var customString = text
-            for i in 1...segmentCount {
+            for _ in 1...segmentCount {
                 let startIndex = customString.startIndex
                 var endIndex = customString.index(startIndex, offsetBy: 180)
                 if customString[endIndex] != " " {
@@ -158,34 +171,38 @@ class TextToSpeechManeger:NSObject{
         NotificationCenter.default.post(name: Constants.NotificationNames.StopSpeechToText,
                                         object: nil)
         print("playing \(url)")
-        //        do {
-        //            let url = URL(fileURLWithPath: url.path)
-        //            let isReachable = try url.checkResourceIsReachable()
-        //            // ... you can set breaking points after that line, and if you stopped at them it means file exist.
-        //        } catch let e {
-        //            print("couldnt load file \(e.localizedDescription)")
-        //        }
-        do {
-            try audioSession.setCategory(AVAudioSession.Category.playback)
-            self.player = try AVAudioPlayer(contentsOf: url)
-            //self.player = try AVAudioPlayer(data: data!)
-            delegate?.textToSpeechDidStart()
-            player?.prepareToPlay()
-            
-            player?.volume = volume
-            player?.enableRate = true
-            player?.rate = voiceRate
-            player?.delegate = self
-            DispatchQueue.global(qos: .background).async { [weak self] in
-                self?.player?.play()
+        playbackGeneration &+= 1
+        let generation = playbackGeneration
+        let targetVolume = volume
+        let targetRate = voiceRate
+        audioSessionQueue.async { [weak self] in
+            guard let self else { return }
+            do {
+                try self.audioSession.setCategory(AVAudioSession.Category.playback)
+                let newPlayer = try AVAudioPlayer(contentsOf: url)
+                newPlayer.prepareToPlay()
+                newPlayer.volume = targetVolume
+                newPlayer.enableRate = true
+                newPlayer.rate = targetRate
+                newPlayer.delegate = self
+
+                DispatchQueue.main.async { [weak self] in
+                    guard let self, self.playbackGeneration == generation else {
+                        newPlayer.stop()
+                        return
+                    }
+                    self.player = newPlayer
+                    self.delegate?.textToSpeechDidStart()
+                    self.audioSessionQueue.async {
+                        newPlayer.play()
+                    }
+                }
+            } catch let error as NSError {
+                print(error.localizedDescription)
+            } catch {
+                print("AVAudioPlayer init failed")
             }
-        } catch let error as NSError {
-            //self.player = nil
-            print(error.localizedDescription)
-        } catch {
-            print("AVAudioPlayer init failed")
         }
-        
     }
     
     func setVolume(volume:Float)  {
@@ -211,6 +228,7 @@ class TextToSpeechManeger:NSObject{
 
     
     func stop() {
+        playbackGeneration &+= 1
         if !isPlaying {
             return
         }
@@ -225,11 +243,36 @@ class TextToSpeechManeger:NSObject{
         delegate?.textToSpeechDidStop()
     }
     
-    func setSessionCategoryForSpeechToText()  {
-        do {
-            try audioSession.setCategory(AVAudioSession.Category.playAndRecord)
-        }catch let err {
-            print(err)
+    func setSessionCategoryForSpeechToText() {
+        configureAudioSession(category: .playAndRecord)
+    }
+
+    private func configureAudioSession(
+        category: AVAudioSession.Category,
+        completion: ((Bool) -> Void)? = nil
+    ) {
+        audioSessionQueue.async { [weak self] in
+            guard let self else {
+                if let completion {
+                    DispatchQueue.main.async {
+                        completion(false)
+                    }
+                }
+                return
+            }
+            let succeeded: Bool
+            do {
+                try self.audioSession.setCategory(category)
+                succeeded = true
+            } catch let err {
+                print(err)
+                succeeded = false
+            }
+            if let completion {
+                DispatchQueue.main.async {
+                    completion(succeeded)
+                }
+            }
         }
     }
     
@@ -241,25 +284,37 @@ class TextToSpeechManeger:NSObject{
     
   
   func playBase64Content(base64String: String) {
-    if let audioPlayer = convertBase64ToVoice(base64String: base64String) {
+    playbackGeneration &+= 1
+    let generation = playbackGeneration
+    let targetVolume = volume
+    let targetRate = voiceRate
+    audioSessionQueue.async { [weak self] in
+        guard let self else { return }
         do {
-            try audioSession.setCategory(AVAudioSession.Category.playback)
-            delegate?.textToSpeechDidStart()
-            audioPlayer.prepareToPlay()
+            try self.audioSession.setCategory(AVAudioSession.Category.playback)
+            guard let audioPlayer = self.convertBase64ToVoice(base64String: base64String) else {
+                print("Failed to convert Base64 to voice.")
+                return
+            }
+            audioPlayer.volume = targetVolume
+            audioPlayer.enableRate = true
+            audioPlayer.rate = targetRate
+            audioPlayer.delegate = self
 
-           audioPlayer.volume = volume
-           audioPlayer.enableRate = true
-           audioPlayer.rate = voiceRate
-           audioPlayer.delegate = self
-
-         // Play the audio
-         audioPlayer.play()
-        }catch {
+            DispatchQueue.main.async { [weak self] in
+                guard let self, self.playbackGeneration == generation else {
+                    audioPlayer.stop()
+                    return
+                }
+                self.player = audioPlayer
+                self.delegate?.textToSpeechDidStart()
+                self.audioSessionQueue.async {
+                    audioPlayer.play()
+                }
+            }
+        } catch {
             print("Failed to create AVAudioPlayer: \(error)")
-          }
-       
-    } else {
-      print("Failed to convert Base64 to voice.")
+        }
     }
   }
   
@@ -272,13 +327,12 @@ class TextToSpeechManeger:NSObject{
     
     do {
       // Create an AVAudioPlayer with the audio data
-        try audioSession.setCategory(AVAudioSession.Category.playback)
-      player = try AVAudioPlayer(data: audioData)
+      let audioPlayer = try AVAudioPlayer(data: audioData)
       
       // Prepare the audio player for playback
-      player?.prepareToPlay()
+      audioPlayer.prepareToPlay()
       
-      return player
+      return audioPlayer
     } catch {
       print("Failed to create AVAudioPlayer: \(error)")
       return nil
@@ -308,32 +362,40 @@ extension TextToSpeechManeger: AVAudioPlayerDelegate{
     
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        if !isPlaying {
-            return
-        }
-        isPlaying = false
-        if TTS_Models_Array.count > 0 {
-            TTS_Models_Array.remove(at: 0)
-        }
-        NotificationCenter.default.post(name: Constants.NotificationNames.FinishCurrentTextToSpeechPhrase,object: nil)
-        if  TTS_Models_Array.count == 0 { // comment for nathealth
-             delegate?.textToSpeechDidStop()
-          //  if Labiba.Temporary_Bot_Type != .keyboardType  {
-                setSessionCategoryForSpeechToText()
-            if AssistantConfig.config.voices.enableAutoListening {
-                    DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.2) {
-                        DispatchQueue.main.async {
-                            NotificationCenter.default.post(name: Constants.NotificationNames.StartSpeechToText,
-                            object: nil)
+        let handleFinish = { [weak self] in
+            guard let self else { return }
+            if !self.isPlaying {
+                return
+            }
+            self.isPlaying = false
+            if self.TTS_Models_Array.count > 0 {
+                self.TTS_Models_Array.remove(at: 0)
+            }
+            NotificationCenter.default.post(name: Constants.NotificationNames.FinishCurrentTextToSpeechPhrase,object: nil)
+            if self.TTS_Models_Array.count == 0 { // comment for nathealth
+                 self.delegate?.textToSpeechDidStop()
+              //  if Labiba.Temporary_Bot_Type != .keyboardType  {
+                    self.setSessionCategoryForSpeechToText()
+                if AssistantConfig.config.voices.enableAutoListening {
+                        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.2) {
+                            DispatchQueue.main.async {
+                                NotificationCenter.default.post(name: Constants.NotificationNames.StartSpeechToText,
+                                object: nil)
+                            }
+                            
                         }
                         
-                    }
-                    
-             //   }
+                 //   }
+                }
+                
             }
             
+            self.playNextAudio()
         }
-        
-        playNextAudio()
+        if Thread.isMainThread {
+            handleFinish()
+        } else {
+            DispatchQueue.main.async(execute: handleFinish)
+        }
     }
 }

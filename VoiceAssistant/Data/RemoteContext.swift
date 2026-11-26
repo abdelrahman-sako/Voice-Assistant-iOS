@@ -221,12 +221,12 @@ final class RemoteContext {
                     multipartFormData.append((value as! String).data(using: .utf8)!, withName: key)
                 }
             }
-            if let files = uploadFiles, let name = multipartName{
+            if let files = uploadFiles, let _ = multipartName{
                 for file in files{
                     multipartFormData.append(file, withName: "Filedata", fileName: fileName, mimeType: mimeType)
                 }
             }
-        }, with: urlRequest) { (result) in
+        }, with: urlRequest) { [weak self] (result) in
             
             switch result {
             case .success(let upload, _, _):
@@ -310,7 +310,7 @@ final class RemoteContext {
         
         
         
-        if var headers = endPoint.headers {
+        if let headers = endPoint.headers {
             headers.keys.forEach({ (key) in
                 urlRequest.setValue(headers[key]!, forHTTPHeaderField: key )
             })

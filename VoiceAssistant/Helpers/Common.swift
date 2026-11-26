@@ -14,7 +14,11 @@ let screenWidth = UIScreen.main.bounds.width
 
 let screenHeight = UIScreen.main.bounds.height
 
-let statusHeight = UIApplication.shared.statusBarFrame.height
+let statusHeight = (UIApplication.shared.connectedScenes
+    .compactMap { $0 as? UIWindowScene }
+    .first { $0.activationState == .foregroundActive }?
+    .statusBarManager?
+    .statusBarFrame.height) ?? 0
 
 
 public func imageNamed(_ name:String)-> UIImage{

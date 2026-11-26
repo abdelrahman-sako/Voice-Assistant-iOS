@@ -749,66 +749,53 @@ extension UIViewController
 {
 
 
-    var safeAreaInsets: UIEdgeInsets
-    {
+    var safeAreaInsets: UIEdgeInsets {
+        if #available(iOS 13.0, *) {
+            let windowScene = UIApplication.shared.connectedScenes
+                .first { $0.activationState == .foregroundActive } as? UIWindowScene
 
-        if #available(iOS 11.0, *)
-        {
-            if let insets = UIApplication.shared.keyWindow?.safeAreaInsets
-            {
+            if let insets = windowScene?.windows.first(where: { $0.isKeyWindow })?.safeAreaInsets {
                 return insets
             }
         }
+
         return UIEdgeInsets.zero
     }
 
-    func fillEdgeSpace(withColor color: UIColor, edge: UIRectEdge) -> Void
-    {
-
-        guard edge == .top || edge == .bottom
-        else
-        {
-            print("Can't be applied to right or left edges ..")
+    func fillEdgeSpace(withColor color: UIColor, edge: UIRectEdge) {
+        guard edge == .top || edge == .bottom else {
+            print("Can't be applied to right or left edges.")
             return
         }
 
-        if #available(iOS 11.0, *)
-        {
+        guard let window = self.view.window else {
+            return
+        }
 
-            if let insets = UIApplication.shared.keyWindow?.alignmentRectInsets
-            {
+        let insets = window.safeAreaInsets
 
-                if edge == .top, insets.top <= 0
-                {
-                    return
-                }
+        let inset: CGFloat = edge == .top ? insets.top : insets.bottom
 
-                if edge == .bottom, insets.bottom <= 0
-                {
-                    return
-                }
+        guard inset > 0 else {
+            return
+        }
 
-                var r = self.view.frame
-                r.origin.y = insets.top
-                r.size.height -= insets.top + insets.bottom
+        let bv = UIView()
+        bv.backgroundColor = color
+        bv.translatesAutoresizingMaskIntoConstraints = false
 
-                let bv = UIView(frame: CGRect(x: 0, y: r.maxY, width: r.width, height: insets.bottom))
-                bv.backgroundColor = color
-                self.view.addSubview(bv)
+        self.view.addSubview(bv)
 
-                if edge == .top
-                {
-                    bv.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
-                }
-                else
-                {
-                    bv.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
-                }
+        NSLayoutConstraint.activate([
+            bv.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bv.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bv.heightAnchor.constraint(equalToConstant: inset)
+        ])
 
-                bv.heightAnchor.constraint(equalToConstant: insets.bottom).isActive = true
-                bv.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
-                bv.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
-            }
+        if edge == .top {
+            bv.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        } else {
+            bv.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         }
     }
     
@@ -840,30 +827,48 @@ extension UIApplication {
 //
 //    }
     
-    func setStatusBarColor(color:UIColor)  {
-        if #available(iOS 13.0, *) {
-            let tag = 38482458385
-          //  if let statusBar = UIApplication.shared.keyWindow?.viewWithTag(tag) {
-               // statusBarView = statusBar
-           // if (UIApplication.shared.keyWindow?.viewWithTag(tag)) != nil {
-                UIApplication.shared.keyWindow?.viewWithTag(tag)?.removeFromSuperview()
-         //   }
-                
-           // } else {
-                let statusBar = UIView(frame: UIApplication.shared.statusBarFrame)
-                statusBar.tag = tag
-                statusBar.backgroundColor = color
-                UIApplication.shared.keyWindow?.addSubview(statusBar)
-              //  statusBarView = statusBar
-            //}
-        } else {
-            (UIApplication.shared.value(forKey: "statusBar") as? UIView)?.backgroundColor = color
+    var keyWindow: UIWindow? {
+        return connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first(where: { $0.isKeyWindow })
+    }
+    
+    func setStatusBarColor(color: UIColor) {
+        let tag = 38482458385
+
+        guard let window = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { $0.activationState == .foregroundActive })?
+            .windows.first(where: { $0.isKeyWindow }) else {
+            return
         }
+
+        window.viewWithTag(tag)?.removeFromSuperview()
+
+        let statusBar = UIView()
+        statusBar.tag = tag
+        statusBar.backgroundColor = color
+        statusBar.translatesAutoresizingMaskIntoConstraints = false
+
+        window.addSubview(statusBar)
+
+        NSLayoutConstraint.activate([
+            statusBar.topAnchor.constraint(equalTo: window.topAnchor),
+            statusBar.leadingAnchor.constraint(equalTo: window.leadingAnchor),
+            statusBar.trailingAnchor.constraint(equalTo: window.trailingAnchor),
+            statusBar.bottomAnchor.constraint(equalTo: window.safeAreaLayoutGuide.topAnchor)
+        ])
     }
 
     
-    var topMostViewController : UIViewController? {
-        return self.keyWindow?.rootViewController?.topMostViewController
+    var topMostViewController: UIViewController? {
+        let keyWindow = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first { $0.activationState == .foregroundActive }?
+            .windows.first { $0.isKeyWindow }
+
+        return keyWindow?.rootViewController?.topMostViewController
     }
 }
 extension UIImageView {

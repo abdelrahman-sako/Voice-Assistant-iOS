@@ -72,7 +72,7 @@ func prettyPrintedResponse(url:String = "",statusCode:Int = 0,method:String = ""
     }
     let errorBlock:(_ error:String)->Void =  { error in
         print("error in \(#function) \n \(error)")
-        print(String(data: data, encoding: .utf8))
+        print(String(data: data, encoding: .utf8) ?? "unkown")
     }
     do {
         

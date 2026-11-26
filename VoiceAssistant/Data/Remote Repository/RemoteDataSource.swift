@@ -215,7 +215,7 @@ class RemoteDataSource:RemoteDataSourceProtocol{
             switch  result {
             case .success(let data):
                 self.parser(data: data, model: TextToSpeachResponseModel.self, handler: handler)
-                let dataString = String(data: data, encoding: .utf8) ?? ""
+//                _ = String(data: data, encoding: .utf8) ?? ""
 //                Logging.shared.logSuccessCase(url: url, tag: .voice, method: .post, parameter: params.description, response: dataString)
             case .failure(let error):
                 handler(.failure(error))

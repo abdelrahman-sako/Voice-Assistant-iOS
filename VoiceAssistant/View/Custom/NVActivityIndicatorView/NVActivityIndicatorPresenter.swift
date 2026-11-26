@@ -302,8 +302,11 @@ public final class NVActivityIndicatorPresenter {
             containerView.addConstraint(spacingConstraint)
             }())
 
-        guard let keyWindow = UIApplication.shared.keyWindow else { return }
-
+        
+        guard let keyWindow = UIApplication.shared.keyWindow else {
+            return
+        }
+        
         keyWindow.addSubview(containerView)
 
         // Add constraints for `containerView`.
@@ -318,9 +321,16 @@ public final class NVActivityIndicatorPresenter {
     }
 
     fileprivate func hide(_ fadeOutAnimation: FadeOutAnimation?) {
-        for window in UIApplication.shared.windows {
-            for item in window.subviews
-                where item.restorationIdentifier == restorationIdentifier {
+
+        let scenes = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+
+        for scene in scenes {
+            for window in scene.windows {
+
+                for item in window.subviews
+                    where item.restorationIdentifier == restorationIdentifier {
+
                     if let fadeOutAnimation = fadeOutAnimation {
                         fadeOutAnimation(item) {
                             item.removeFromSuperview()
@@ -328,7 +338,9 @@ public final class NVActivityIndicatorPresenter {
                     } else {
                         item.removeFromSuperview()
                     }
+                }
             }
         }
     }
+    
 }

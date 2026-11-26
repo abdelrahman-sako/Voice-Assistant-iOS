@@ -27,13 +27,44 @@ protocol SpeechAudioSessionControlling {
     var isInputAvailable: Bool { get }
     var recordPermission: AVAudioSession.RecordPermission { get }
     func setCategory(_ category: AVAudioSession.Category) throws
-    func setSessionActive(_ active: Bool) throws
+    func setSessionActive(_ active: Bool, completion: @escaping (Bool) -> Void)
     func requestRecordPermission(_ response: @escaping (Bool) -> Void)
 }
 
 extension AVAudioSession: SpeechAudioSessionControlling {
-    func setSessionActive(_ active: Bool) throws {
-        try setActive(active)
+    func setSessionActive(_ active: Bool, completion: @escaping (Bool) -> Void) {
+        if #available(iOS 27.0, *) {
+            if active {
+                activate(options: []) { activated, error in
+                    if let error {
+                        print(error)
+                    }
+                    completion(activated && error == nil)
+                }
+            } else {
+                deactivate(options: []) { deactivated, error in
+                    if let error {
+                        print(error)
+                    }
+                    completion(deactivated && error == nil)
+                }
+            }
+        } else {
+            let performSetActive = {
+                do {
+                    try self.setActive(active)
+                    completion(true)
+                } catch {
+                    print(error)
+                    completion(false)
+                }
+            }
+            if Thread.isMainThread {
+                DispatchQueue.global(qos: .userInitiated).async(execute: performSetActive)
+            } else {
+                performSetActive()
+            }
+        }
     }
 }
 
@@ -49,7 +80,11 @@ class SpeechToTextManager {
     private var timer:Timer?
     private var isVoiceRecognitionAuthorized:Bool = false
     private(set) var isRecording:Bool = false
+    private(set) var isStarting:Bool = false
     private var hasInstalledTap:Bool = false
+    private var startGeneration: Int = 0
+    static let sharedAudioSessionQueue = DispatchQueue(label: "com.voiceassistant.speech.audiosession", qos: .userInitiated)
+    private let audioSessionQueue = SpeechToTextManager.sharedAudioSessionQueue
     private let audioSession: SpeechAudioSessionControlling
     private let speechAuthorizationStatusProvider: () -> SFSpeechRecognizerAuthorizationStatus
     
@@ -63,7 +98,7 @@ class SpeechToTextManager {
         self.speechAuthorizationStatusProvider = speechAuthorizationStatusProvider
         addObservers()
         if #available(iOS 13, *) {
-            print("supported locals: ",speechRecognizer?.supportsOnDeviceRecognition.description)
+            print("supported locals: ",speechRecognizer?.supportsOnDeviceRecognition.description ?? "unkown")
         } else {
             // Fallback on earlier versions
         }
@@ -78,6 +113,8 @@ class SpeechToTextManager {
     }
     
     private func recordAndRecognizeSpeech()  {
+        guard !isStarting else { return }
+
         let authStatus = speechAuthorizationStatusProvider()
         isVoiceRecognitionAuthorized = (authStatus == .authorized)
         guard isVoiceRecognitionAuthorized else {
@@ -92,13 +129,27 @@ class SpeechToTextManager {
             return
         }
 
-        guard setSessionCategoryForSpeechToText(),
-              audioSession.category == .playAndRecord,
-              audioSession.isInputAvailable else {
-            notifyFinishRecording()
-            return
-        }
+        startGeneration &+= 1
+        let generation = startGeneration
+        isStarting = true
 
+        setSessionCategoryForSpeechToText { [weak self] activated in
+            guard let self else { return }
+            guard self.startGeneration == generation else { return }
+            self.isStarting = false
+
+            guard activated,
+                  self.audioSession.category == .playAndRecord,
+                  self.audioSession.isInputAvailable else {
+                self.notifyFinishRecording()
+                return
+            }
+
+            self.startRecognitionSessionAfterAudioActivation()
+        }
+    }
+
+    private func startRecognitionSessionAfterAudioActivation() {
         setLocal()
         guard let myRecognizer = speechRecognizer else {
             print("recognizer is not supported for the current local")
@@ -211,20 +262,36 @@ class SpeechToTextManager {
             isRecording =  false
             timer?.invalidate()
             self.stop()
+       } else if isStarting {
+            startGeneration &+= 1
+            isStarting = false
+            notifyFinishRecording()
        }
     }
     
     // MARK: - Control
     
-    @discardableResult
-    func setSessionCategoryForSpeechToText() -> Bool {
-        do {
-            try audioSession.setCategory(AVAudioSession.Category.playAndRecord)
-            try audioSession.setSessionActive(true)
-            return true
-        } catch let err {
-            print(err)
-            return false
+    func setSessionCategoryForSpeechToText(completion: @escaping (Bool) -> Void) {
+        audioSessionQueue.async { [weak self] in
+            guard let self else {
+                DispatchQueue.main.async {
+                    completion(false)
+                }
+                return
+            }
+            do {
+                try self.audioSession.setCategory(AVAudioSession.Category.playAndRecord)
+                self.audioSession.setSessionActive(true) { activated in
+                    DispatchQueue.main.async {
+                        completion(activated)
+                    }
+                }
+            } catch let err {
+                print(err)
+                DispatchQueue.main.async {
+                    completion(false)
+                }
+            }
         }
     }
 
@@ -232,6 +299,8 @@ class SpeechToTextManager {
         timer?.invalidate()
         timer = nil
         if cancelTask {
+            startGeneration &+= 1
+            isStarting = false
             isRecording = false
         }
         if hasInstalledTap {

@@ -10,16 +10,15 @@ import MobileCoreServices
 
 
 
+import UniformTypeIdentifiers
+
 extension URL {
-    
-    var mimeType:String {
-        
-        if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, self.pathExtension as NSString, nil)?.takeRetainedValue() {
-            if let mimetype = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() {
-                return mimetype as String
-            }
+    var mimeType: String {
+        if let type = UTType(filenameExtension: self.pathExtension),
+           let mimeType = type.preferredMIMEType {
+            return mimeType
         }
-        
+
         return "application/octet-stream"
     }
 }

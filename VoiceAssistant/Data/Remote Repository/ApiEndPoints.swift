@@ -56,7 +56,7 @@ struct EndPoint: EndPointProtocol {
 //        }
 //    }
     func getHeaders(headers:[String:String]? = nil)->[String:String]{
-        var finalHeaders = headers
+        let finalHeaders = headers
       //  let securityHeaders = getSecurityHeaders()
 //        for tokenDict in securityHeaders{
 //            finalHeaders = tokenDict

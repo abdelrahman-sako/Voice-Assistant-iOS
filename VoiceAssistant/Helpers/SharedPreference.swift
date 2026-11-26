@@ -63,7 +63,7 @@ class SharedPreference{
 
     
     func getCurrentUserId()-> String{
-        var currentLanguageCode = SharedPreference.shared.botLangCode
+        let currentLanguageCode = SharedPreference.shared.botLangCode
         switch currentLanguageCode {
         case .ar:
             return standered.object(forKey: Keys.userIdAR.rawValue) as? String ?? "en"
